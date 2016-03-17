@@ -8,14 +8,26 @@ classdef BST
         %Metodo constuctor de la clase 
         function obj = BST(root)
              obj.root = root;         
-         end
-        %Metodo que busca un nodo dentro del arbol, devuelve true si lo encuentra y false si no existe.
-        function exists = search(Nodo)
-            exists = 0;
-            
-            
+        end
+        % Busca el arco justo encima del evento p, devuelve el nodo
+        % asociado a dicho arco
+        function Nodo = searchNode(obj, p , linePos)
+            pXCoor = p.giveX();
+            f = 0;
+            rt = obj.root;
+            while f == 0
+                if rt.xCoord(linePos)< pXCoor
+                    if rt.giveLeft() == []
+                        
+                    end
+                    
+                
+                end
+                
+            end
             
         end
+        
         
              
              
