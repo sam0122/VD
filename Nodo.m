@@ -1,5 +1,5 @@
-classdef Nodo
-    properties(GetAccess = 'public', SetAccess = 'private')
+classdef Nodo < handle
+    properties
         %Pointers a los nodos a la izquierda y a la derecha
         lLink;
         rLink;
@@ -21,20 +21,18 @@ classdef Nodo
         site
     end
     
-    methods(Access = public)
-        function obj = Nodo(left, right, parent, arc, brkPoint, pointer, site)
+    methods
+        function obj = Nodo(parent, arc, brkPoint,site)
             %Metodo constructor de la clase
             if nargin>0
                 obj.parent = parent;
                 if arc == 0
                     obj.brkPoint = brkPoint;
-                    obj.lLink = left;
-                    obj.rLink = right;
                     obj.isArc = 0;
-                    obj.edge = pointer;
+                    %obj.edge = pointer;
                 else 
                     obj.isArc = 1;
-                    obj.circleEvent = pointer;
+                    %obj.circleEvent = pointer;
                     obj.site = site;
                 end
             end
@@ -43,6 +41,10 @@ classdef Nodo
                 %Calcula la coordenada x del breakpoint teniendo como
                 %parametro la posición de la sweep line.
                 x = centroCirculo (obj.brkPoint, linePos);
+        end
+        %Funcion retorna el tipo de nodo
+        function s = status(obj)
+            s = obj.isArc;
         end
         %Funcion que devuelve el nodo izquierdo del nodo actual
         function Nodo = giveLeft(obj)
@@ -57,43 +59,65 @@ classdef Nodo
             Nodo = obj.parent;
         end
         %Funcion que inserta un nodo a la izquierda
-        function setLeft(obj, nodo)
-            obj.lLink = nodo; %#ok<MCHV2>
+        function set.lLink(obj, nodo)
+            obj.lLink = nodo;
         end
         %Funcion que inserta un nodo a la derecha
-        function setRight(obj, nodo)
-            obj.rLink = nodo;
-        end
+        %function set.rLink(obj, nodo)
+        %    obj.rLink = nodo;
+        %end
         %Funcion que cambia el nodo padre del nodo actual
-        function setParent(obj, nodo)
+        function set.parent(obj, nodo)
             obj.parent = nodo;
+            
         end
-        %Función que devuelve la coordenada x si el nodo es una rama
-        function x = xCoorArc(obj)
-            sit = obj.site;
-            x = sit.retCoordX();
+        function set.isArc(obj,valor )
+            obj.isArc = valor;
+            
         end
+       %Funcion que retorna el evento generador del nodo actual
+        function Evento = giveSiteEvent(obj)
+             Evento = obj.site;
+        end
+       %Funcion que retorna el evento de circulo del nodo actual
+        function evento = giveCircleEvent(obj)
+             evento = obj.circleEvent;
+        end
+        
+        function set.circleEvent(obj, evento)
+            obj.circleEvent = evento;
+            
+        end
+        
         %Función que devuelve la coordenada x del nodo si es un brkpoint o
         %del sitio es es un arco
         function x = xCoord(obj, linePos)
             if obj.isArc == 0
                 x = centroCirculo (obj.brkPoint, linePos);
             else 
-            sit = obj.site;
-            x = sit.xCoord();
+                sit = obj.site;
+                x = sit.xCoord();
             end
             
         end
         % Actualiza la condición del nodo
         function refreshState(obj)
-            if obj.lLink && obj.rLink == []
+            if isempty(obj.lLink) && isempty(obj.rLink)
                 obj.isArc = 1;
             else 
                 obj.isArc = 0;
+                obj.site  = [];
             end
             
             
         end
+        
+        %Elimina el cicle event asociado al nodo 
+        
+        function deleteCE (obj)
+            obj.circleEvent = [];
+        end
+        
         
         
      end
