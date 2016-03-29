@@ -1,8 +1,8 @@
 function t = test()
 %r = cells(10,1);
-pj = Evento(4,10,0);
-pk = Evento(6,7,0);
-pi = Evento(8,5,0);
+pj = Evento(7,10,0);
+pk = Evento(10.3,8,0);
+pi = Evento(4.5,8.2,0);
 
 NodoRaiz = Nodo([],1,[],pj);
 
@@ -30,7 +30,9 @@ t = BST(NodoRaiz);
 %Nodo2 = t.searchNode(pi);
 %centroCirculo(brkpoint, linepos)
 
-t.insertArc(pk);
 t.insertArc(pi);
+t.insertArc(pk);
+%conv = convergence(pi, pj, pk);
+
 
 end
