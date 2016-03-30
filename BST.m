@@ -72,9 +72,9 @@ classdef BST < handle
                 tp2.lLink = pi;
                 tp2.rLink = pj2;
                 
-                arcs(1,1)= pj;%Izquierda
-                arcs(1,2)= pi;%Centro
-                arcs(1,3)= pj2;%Derecha
+                arcs{1,1}= pj;%Izquierda
+                arcs{1,2}= pi;%Centro
+                arcs{1,3}= pj2;%Derecha
             else 
                 %Subarbol que inserta el nuevo arco cuando el sitio nuevo está a
                 %la izquierda del sitio que genera el arco ya existente.
@@ -94,95 +94,48 @@ classdef BST < handle
                 tp2.rLink = pi;
                 tp2.lLink = pj2;
                 
-                arcs(1,1)= pj2;%Izquierda
-                arcs(1,2)= pi;%Centro
-                arcs(1,3)= pj;%Derecha
+                arcs{1,1}= pj;%Derecha
+                arcs{1,2}= pi;%Centro
+                arcs{1,3}= pj2;%Izquierda
                 
             end
             
         end
-        %Funcion que encuentra los arcos consecutivos 
-        function trip = triples(obj,arcs)
-            
-            trip =  cell(1,2);
-            
-            pj= arcs{1,1};
-            pi= arcs{1,2};
-            pj2 = arcs{1,3}; 
+       
         
-            n1 = pj2.parent;
-            found = false;
-            
-            %Primer elemento de la celda guarda la tripleta en la que pi es
-            %el nodo izquierdo.Segundo elemento guarda la tripleta enla que
-            %pi es el nodo derecho.
-            if eq(pj2,n1.lLink)
-                n2 = n1.rLink;
-                while found == false
-                    if n2.isArc == 0
-                        n2 = n2.lLink;
-                    else
-                        pk = n2;
-                        found = true;
-                        trip{1,1} = [pi,pj2,pk];
-                        
-                    end
-                    
+        
+        function createCircleEvent(~,arcs)
+            %Cell cuyo primer elemento es la tripleta con pi a la
+            %izquierda. El segundo elemento es la tripleta con pi a la
+            %derecha.           
+            trip = triples(arcs);
+            if isempty(trip{1,1})== 0
+                conv1 = convergence(trip{1,1}(1,1),trip{1,1}(1,2),trip{1,1}(1,3));
+                if conv1 == 1 %do add Q to trip{1,1}(1,2)
+                    cc = centroCirculo3Puntos(trip{1,1}(1,1),trip{1,1}(1,2),trip{1,1}(1,3));
+                    r = cc(1,3);
+                    % Punteros entre el nodo medio y el evento de circulo
+                    % donde desaparecerá
+                    ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,1}(1,2));
+                    trip{1,1}(1,2).circleEvent = ce;
                 end
-            else
-                n2 = n1.lLink;
-                while found == false
-                    if n2.isArc == 0
-                        n2 = n2.rLink;
-                    else
-                        pk = n2;
-                        found = true;
-                        trip{1,2} = [pk,pj2,p1];
-                    end
-                    
-                end
-                
                 
             end
-            
-            n3 = pi.parent;
-            n4 = n3. parent;
-            n5 = n4.parent;
-            
-            if isempty(n5)== 0
-                if eq(n4,n5.rLink)
-                n6 = n5.lLink;
-                    while found == false
-                        if n6.isArc == 0
-                             n6 = n6.rLink;
-                        else
-                             pm = n6;
-                             found = true;
-                             trip{1,2} = [pm,pj,pi];
-                        
-                         end
-                    
-                    end
-                else
-                    n6 = n5.rLink;
-                    while found == false
-                         if n6.isArc == 0
-                             n6 = n6.lLink;
-                         else
-                              pm = n6;
-                              found = true;
-                              trip{1,1} = [pi,pj,pm];
-                        
-                         end
-                    
-                    end
-                    
+            if isempty(trip{1,2})== 0
+                conv2 = convergence(trip{1,2}(1,1),trip{1,2}(1,2),trip{1,2}(1,3));
+                if conv2 == 1 %do add Q to trip{1,1}(1,2)
+                    cc = centroCirculo3Puntos(trip{1,2}(1,1),trip{1,2}(1,2),trip{1,2}(1,3));
+                    r = cc(1,3);
+                    % Punteros entre el nodo medio y el evento de circulo
+                    % donde desaparecerá
+                    ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,2}(1,2));
+                    trip{1,2}(1,2).circleEvent = ce;
                 end
                 
-                
-                
             end
+        
         end
+        
         
         
         

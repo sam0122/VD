@@ -118,6 +118,10 @@ classdef Nodo < handle
             obj.circleEvent = [];
         end
         
+        function y = yCoord(obj)
+            sit = obj.site;
+            y = sit.yCoord();
+        end
         
         
      end
