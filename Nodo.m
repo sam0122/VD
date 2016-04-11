@@ -4,8 +4,8 @@ classdef Nodo < handle
         lLink;
         rLink;
         %Tuple que representa la pareja de sitios que forman el breakpoint
-        %si el nodo es interno, es una celda que contiene dos arreglos con
-        %las coordenadas respectivas
+        %si el nodo es interno,es una celda con los dos sitios que lo
+        %forman.
         brkPoint;
         %Indica si el nodo es interno o una rama
         isArc;

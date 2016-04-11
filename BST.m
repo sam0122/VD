@@ -104,7 +104,7 @@ classdef BST < handle
        
         
         
-        function createCircleEvent(~,arcs)
+        function createCircleEvent(~,arcs,q)
             %Cell cuyo primer elemento es la tripleta con pi a la
             %izquierda. El segundo elemento es la tripleta con pi a la
             %derecha.           
@@ -118,6 +118,7 @@ classdef BST < handle
                     % donde desaparecerá
                     ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,1}(1,2));
                     trip{1,1}(1,2).circleEvent = ce;
+                    q.insertEvent(ce);
                 end
                 
             end
@@ -130,12 +131,86 @@ classdef BST < handle
                     % donde desaparecerá
                     ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,2}(1,2));
                     trip{1,2}(1,2).circleEvent = ce;
+                    q.insertEvent(ce);
                 end
                 
             end
         
         end
         
+        %Elimina el arco que va a desaparecer cuando ocurre el evento de círculo ce 
+        function  removeArc(~, ce, Q)
+          
+            px = ce.nodo;
+            p = px.parent;
+            pp = p.parent;
+            Q.removeEvent(ce);
+            px.circleEvent = [];
+            
+            
+          %Rutina para eliminar el arco asociado a ce y actualizar el árbol    
+            if px == p.lLink
+                bp = p.brkPoint;
+                n2 = bp{1,2};
+                ev = n2.circleEvent;
+                Q.removeEvent(ev);%Rutina para eliminar todos los eventos de círculo asociados a px
+                n2.circleEvent = [];
+                ps = p.rLink;
+            elseif px == p.rLink
+                bp = p.brkPoint;
+                n2 = bp{1,1};
+                ev = n2.circleEvent;
+                Q.removeEvent(ev);%Rutina para eliminar todos los eventos de círculo asociados a px
+                n2.circleEvent = [];
+                ps = p.lLink;
+            end
+            
+            if p == pp.lLink
+                
+                bp = pp.brkPoint;
+                n2 = bp{1,2};
+                ev = n2.circleEvent;
+                Q.removeEvent(ev);%Rutina para eliminar todos los eventos de círculo asociados a px
+                n2.circleEvent = [];
+                
+                pp.lLink = ps;
+                found = 0;
+                pk = ps.rLink;
+                while found == 0
+                    if isempty(pk.rLink) == 1
+                        found = 1;
+                    else
+                        pk = pk.rLink;
+                    end
+                end
+                pp.brkPoint{1,1} = pk;
+            elseif p == pp.rLink
+                
+                bp = pp.brkPoint;
+                n2 = bp{1,1};
+                ev = n2.circleEvent;
+                Q.removeEvent(ev);%Rutina para eliminar todos los eventos de círculo asociados a px
+                n2.circleEvent = [];
+                
+                pp.rLink = ps;
+                found = 0;
+                pk = ps.lLink;
+                while found == 0
+                    if isempty(pk.lLink) == 1
+                        found = 1;
+                    else
+                        pk = pk.lLink;
+                    end
+                end
+                pp.brkPoint{1,2} = pk;
+                
+            end
+            
+            ps.parent = pp;
+            
+            
+
+        end
         
         
         

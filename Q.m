@@ -13,7 +13,7 @@ classdef Q < handle
             obj.tail = tail;
         
         end
-        
+        %Método de inserta el evento en la lista ordenada
         function insertEvent(obj, event)
             yn = event.yCoord();
             yh = obj.head.yCoord();
@@ -67,7 +67,7 @@ classdef Q < handle
             
             
         end
-        
+        %Método que elimina el evento de la lista ordenada
         function removeEvent(obj, event)
             
             yn = event.yCoord();
