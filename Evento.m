@@ -1,8 +1,10 @@
 classdef Evento < handle
     properties
-        %Coordenadas del evento
+        %Coordenadas del evento, punto más bajo del círculo
         x;
         y;
+        %Radio del círculo
+        r;
         type; %puede ser de sitio "0" o  de circulo "1".
         nodo; % Si el evento es un evento de circulo, nodo es un puntero al arco que desaparecerá si el evento ocurre.
         %Control para la lista prioritaria.
@@ -11,15 +13,17 @@ classdef Evento < handle
     end
     
     methods
-        function obj = Evento(xC, yC, t,nodo)
+        function obj = Evento(xC, yC, t,nodo, radio)
             
                 obj.x = xC;
                 obj.y = yC;
                 obj.type = t;
                 obj.nodo = nodo;
+                obj.r = radio;
                 
                 obj.prev = [];
-                pbj.next = [];
+                obj.next = [];
+               
             
         end 
         

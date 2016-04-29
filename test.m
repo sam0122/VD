@@ -1,8 +1,8 @@
 function t = test()
 %r = cells(10,1);
-pj = Evento(7,10,0,[]);
-pk = Evento(10.3,8,0,[]);
-pi = Evento(4.5,8.2,0,[]);
+pj = Evento(7,10,0,[],[]);
+pk = Evento(10.3,8,0,[],[]);
+pi = Evento(4.5,8.2,0,[],[]);
 
 NodoRaiz = Nodo([],1,[],pj);
 

@@ -11,7 +11,7 @@ classdef BST < handle
         end
         % Busca el arco justo encima del evento p, devuelve el nodo
         % asociado a dicho arco
-        function Nodo = searchNode(obj, p)
+        function Nodo = searchNode(obj, p,Q)
             pXCoor = p.xCoord();
             linepos = p.yCoord();
             found = 0;
@@ -39,11 +39,19 @@ classdef BST < handle
                 
                 
                 end
-             end
+            end
+            %Eliminar el evento de circulo asociado al nodo, ya que es una
+            %falsa alarma
+            ce = Nodo.circleEvent;
+            if isempty(ce) == 0
+                Nodo.circleEvent = [];
+                Q.removeEvent(ce);
+            end
             
+           
         end
         %Funcion que inserta el arco correspondiente al nuevo sitio p.
-        function arcs = insertArc(obj, p)
+        function arcs = insertArc(obj, p, D)
             
             arcs = cell(1,3);
             tp1 = searchNode(obj, p);
@@ -60,10 +68,10 @@ classdef BST < handle
                 tp1.refreshState();
             
                 bPoint1 = {sj,si};
-                tp1.brkPoint = bPoint1;
+                tp1.brkPoint = bPoint1;%Nodo interno 
                 
                 bPoint2 = {si,sj};
-                tp2 = Nodo(tp1,0,bPoint2, []);
+                tp2 = Nodo(tp1,0,bPoint2, []);%Nodo interno
                 tp1.rLink = tp2;
                 
                 pi = Nodo(tp2,1,[],si);
@@ -75,6 +83,26 @@ classdef BST < handle
                 arcs{1,1}= pj;%Izquierda
                 arcs{1,2}= pi;%Centro
                 arcs{1,3}= pj2;%Derecha
+                
+                %Rutina que agrega el borde que empieza a ser trazado por
+                %los dos nuevos breakpoints
+                f = Face([],pi.site);
+                e = Edge([],f,[],[],[]);
+                ft = Face([],pj.site);
+                et = Edge([],ft,e,[],[]);
+                e.twin = et;
+                f.edge = e;
+                ft.edge = et;
+                
+                e.node = tp1; %Conexión con el nodo interno que traza el borde.
+                et.node = tp2;
+                tp1.edge = e;
+                tp2.eddge = et;
+                
+                D.addEdge(e);
+                D.addFace(f);
+                
+                
             else 
                 %Subarbol que inserta el nuevo arco cuando el sitio nuevo está a
                 %la izquierda del sitio que genera el arco ya existente.
@@ -98,6 +126,24 @@ classdef BST < handle
                 arcs{1,2}= pi;%Centro
                 arcs{1,3}= pj2;%Izquierda
                 
+                %Rutina que agrega el borde que empieza a ser trazado por
+                %los dos nuevos breakpoints
+                f = Face([],pj.site);
+                e = Edge([],f,[],[]);
+                ft = Face([],pi.site);
+                et = Edge([],ft,e,[]);
+                e.twin = et;
+                f.edge = e;
+                ft.edge = et;
+                
+                e.node = tp1; %Conexión con el nodo interno(brkPoint) que traza el borde.
+                et.node = tp2;
+                tp1.edge = e;
+                tp2.eddge = et;
+                
+                D.addEdge(e);
+                D.addFace(f);
+                
             end
             
         end
@@ -116,7 +162,7 @@ classdef BST < handle
                     r = cc(1,3);
                     % Punteros entre el nodo medio y el evento de circulo
                     % donde desaparecerá
-                    ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,1}(1,2));
+                    ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,1}(1,2),r);
                     trip{1,1}(1,2).circleEvent = ce;
                     q.insertEvent(ce);
                 end
@@ -129,7 +175,7 @@ classdef BST < handle
                     r = cc(1,3);
                     % Punteros entre el nodo medio y el evento de circulo
                     % donde desaparecerá
-                    ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,2}(1,2));
+                    ce = Evento(cc(1,1),cc(1,2)+r,1,trip{1,2}(1,2),r);
                     trip{1,2}(1,2).circleEvent = ce;
                     q.insertEvent(ce);
                 end
@@ -144,6 +190,9 @@ classdef BST < handle
             px = ce.nodo;
             p = px.parent;
             pp = p.parent;
+            
+            
+            v= Vertex([],[]);
             Q.removeEvent(ce);
             px.circleEvent = [];
             
