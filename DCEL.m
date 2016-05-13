@@ -6,9 +6,9 @@ classdef DCEL < handle
     properties
         %La lista se modela como tres arreglos que contienen los elementos:
         %semi-bordes, vértices y caras.     
-        edges = [];
-        vertices = [];
-        faces = [];
+        edges = {};
+        vertices = {};
+        faces = {};
     end
     
     methods
@@ -20,14 +20,18 @@ classdef DCEL < handle
         function addEdge(obj,edge)
             
            s = size(obj.edges);
-           obj.edges(s(1,1)+1,s(1,2)) = edge;
+           i = s(1,1) + 1;
+           j = 1;
+           obj.edges{i,j} = edge;
            
         end
         %Método que añade una nueva cara 
         function addFace(obj,face)
             
            s = size(obj.faces);
-           obj.faces(s(1,1)+1,s(1,2)) = face;
+           i = s(1,1) + 1;
+           j = 1;
+           obj.faces{i,j} = face;
            
         end
         
@@ -35,7 +39,9 @@ classdef DCEL < handle
         function addVertex(obj,vertex)
             
            s = size(obj.vertices);
-           obj.vertices(s(1,1)+1,s(1,2)) = vertex;
+           i = s(1,1) + 1;
+           j = 1;
+           obj.vertices{i,j} = vertex;
            
         end
         

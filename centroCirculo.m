@@ -1,7 +1,7 @@
 function x = centroCirculo(brkPoint, linePos)
     
-    sitio1 = brkPoint{1,1};%sitio1 y sitio2 son vaiables de tipo Evento
-    sitio2 = brkPoint{1,2};
+    sitio1 = brkPoint(1,1);%sitio1 y sitio2 son variables de tipo Evento
+    sitio2 = brkPoint(1,2);
     pix = sitio1.xCoord();
     piy = sitio1.yCoord();
     pjx = sitio2.xCoord();

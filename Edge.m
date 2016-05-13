@@ -2,7 +2,7 @@ classdef Edge < handle
     %Clase que representa las lineas del diagrama
         
     properties
-        vertex; %Objeto de clase Vertex que representa el vértice de origen del objeto.
+        vertex; %Objeto de clase Vertex que representa el vértice de origen del objeto. Punto final del gemelo
         face; %Objeto de clase Face la cara externa (izquierda) del objeto.
         twin; %Objeto de clase Edge que corresponde al semi-borde gemelo del objeto.
         next; %Objeto de clase Edge que corresponde al semi-borde izquierdo siguiente al objeto.

@@ -3,7 +3,7 @@ classdef Vertex < handle
         
     properties
         edge; %Objeto de clase Edge que tienen este objeto como vértice de inicio
-        pos; %Tupla {x,y} que representa las coordenadas del vertice
+        pos; %Array (x,y) que representa las coordenadas del vertice
     end
     
     methods

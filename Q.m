@@ -15,57 +15,78 @@ classdef Q < handle
         end
         %Método de inserta el evento en la lista ordenada
         function insertEvent(obj, event)
-            yn = event.yCoord();
-            yh = obj.head.yCoord();
-            yt = obj.tail.yCoord();
-            
-            if yn > yh 
-                
-                event.next = obj.head;
-                obj.head.prev = event;
-                obj.head = event;
-                event.prev = [];
-                
-            elseif yn < yt
-                event.prev = obj.tail;
-                obj.tail.next = event;
-                obj.tail = event;
-                event.next = [];
-                
-            else   
-                u = false;
-                ei = obj.head.next;
-                ej = ei.next;
-                
-                yi = ei.yCoord();
-                yj = ej.yCoord();
-                
-                while u == 0
-                    if yn < yi && yn > yj
-                        ei.next = event;
-                        event.prev = ei;
-                        
-                        ej.prev = event;
-                        event.next = ej;
-                        
-                        u = 1;
-                    else
-                        ei = ej;
-                        ej = ei.next;
-                
-                        yi = ei.yCoord();
-                        yj = ej.yCoord();
-                        
-                    
+           if isempty(obj.head) || isempty(obj.tail)
+               
+               if isempty(obj.head)
+                  obj.head = event;  
+               elseif isempty(obj.tail)
+                   if event.yCoord() > obj.head.yCoord()
+                       obj.tail = obj.head;
+                       obj.head = event;
+                       event.next = obj.tail;
+                       obj.tail.prev = event;
+                   else
+                       obj.tail =event;
+                       obj.head.next = event;
+                       event.prev = obj.head;
+                   end
+               end
+               
+               
+           else     
+                yn = event.yCoord();
+                yh = obj.head.yCoord();
+                yt = obj.tail.yCoord();
+
+                if yn > yh 
+
+                    event.next = obj.head;
+                    obj.head.prev = event;
+                    obj.head = event;
+                    event.prev = [];
+
+                elseif yn < yt
+                    event.prev = obj.tail;
+                    obj.tail.next = event;
+                    obj.tail = event;
+                    event.next = [];
+
+                else   
+                    u = false;
+                    %ei = obj.head.next;
+                    ei = obj.head;
+                    ej = ei.next;
+
+                    yi = ei.yCoord();
+                    yj = ej.yCoord();
+
+                    while u == 0
+                        if yn < yi && yn > yj
+                            ei.next = event;
+                            event.prev = ei;
+
+                            ej.prev = event;
+                            event.next = ej;
+
+                            u = 1;
+                        else
+                            ei = ej;
+                            ej = ei.next;
+
+                            yi = ei.yCoord();
+                            yj = ej.yCoord();
+
+
+                        end
+
+
                     end
-                    
-                    
+
+
                 end
-                
-                
-            end
             
             
+           end
         end
         %Método que elimina el evento de la lista ordenada
         function removeEvent(obj, event)
@@ -98,10 +119,14 @@ classdef Q < handle
                         ei.prev = [];
                         u = 1;
                     else
+                        ej = ei;
+                        ei = ek;
+                        ek = ei.next;
+                        %{
                         ei = ek;
                         ej = ei.prev;
                         ek = ei.next;
-                
+                        %}
                         yi = ei.yCoord();
                         
                     end

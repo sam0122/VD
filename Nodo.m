@@ -1,11 +1,12 @@
 classdef Nodo < handle
     properties
-        %Pointers a los nodos a la izquierda y a la derecha
+        %Pointers a los nodos a la izquierda y a la derecha, si es un
+        %BREAKPOINT (NODO INTERNO)
         lLink;
         rLink;
         %Tuple que representa la pareja de sitios que forman el breakpoint
-        %si el nodo es interno,es una celda con los dos sitios que lo
-        %forman.
+        %si el nodo es interno,es vector con los sitios que
+        %lo forman. Es un arreglo con elementos de tipo Evento(sitio).
         brkPoint;
         %Indica si el nodo es interno o una rama
         isArc;
@@ -19,6 +20,12 @@ classdef Nodo < handle
         %Pointer al sitio que origina el nodo si este es una rama (arco) Es
         %un objeto de tipo Evento
         site
+        %Pointers a la izquierda y a la derecha si el nodo es un ARC(NODO
+        %EXTERNO)
+        prev;
+        next;
+        %Indica si el nodo interno es rojo 1 o  negro 0. Si el nodo es externo el color siempre es negro. 
+        color
     end
     
     methods
@@ -93,7 +100,10 @@ classdef Nodo < handle
         %del sitio es es un arco
         function x = xCoord(obj, linePos)
             if obj.isArc == 0
-                x = centroCirculo (obj.brkPoint, linePos);
+                pj = obj.brkPoint(1,1);
+                pi = obj.brkPoint(1,2);
+                
+                x = brkCoord(pj.xCoord,pj.yCoord,pi.xCoord,pi.yCoord ,linePos);
             else 
                 sit = obj.site;
                 x = sit.xCoord();
@@ -107,6 +117,9 @@ classdef Nodo < handle
             else 
                 obj.isArc = 0;
                 obj.site  = [];
+                obj.prev = [];
+                obj.next = [];
+                
             end
             
             
