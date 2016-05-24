@@ -1,14 +1,58 @@
-function [q,T] = VD(n,a,b)
+function DC = VD(n,a,b)
     p = points(n,a,b);
+    %{
+    p = [       
+          
+        
+        
+        2.1875    3.6629
+        3.6232    3.8824
+        3.8300    3.1688
+        2.35      4.93
+        1.71      4.
+        3.8596    3.8380
+        1.1140    1.6870
+        
+       
+        
+        
+        
+       
+        ];
+    %}
+     %{
+       0.5079    3.8287
+         3.2589    0.6305
+       0.3902    0.5675
+        
+   
+        
+        
+    %}    
+    %p = sortrows(p,2);    
+        %{
+      
+        
+        
+        ];
+     %}
+    
+    %{
+    p = [
+         
+         0.76 3.08
+         3    2.54];
+    %}
     q = Q([],[]);
     DC = DCEL();
     %Plot de los sitios
     plot(p(:,1),p(:,2),'.');
-    
+    hold on;
+    n = size(p);
     %e = Evento(p(1,1),p(1,2),0,[],[]);
     %q.head = e;
     %Iniciar estructuras de datos Q y DCEL
-    for i = 1:n
+    for i = 1:n(1,1)
         e = Evento(p(i,1),p(i,2),0,[],[],[]);
         q.insertEvent(e);
         f = Face([],e);
@@ -17,14 +61,14 @@ function [q,T] = VD(n,a,b)
     end
     %Iniciar árbol binario T
     head = q.head;
-    root = Nodo([],1,[],head);
+    root = Nodo(1,[],head);
     T = BST(root);
     q.removeEvent(head);
     %Algoritmo de Fortune
     counter = 0;
     finish = 0;
     while finish == 0
-        if q.head == q.tail
+        if isempty(q.head) && isempty(q.tail)
             finish = 1;
         else 
             ev = q.head;
@@ -32,7 +76,7 @@ function [q,T] = VD(n,a,b)
             %Manejo de evento de sitio
             if ev.type == 0
                 q.removeEvent(ev);
-                arcs = T.insertArc(ev,DC);
+                arcs = T.insertArc(ev,q,DC);
                 trip = triples(arcs);
                 T.createCircleEvent(trip,q);
                 %{
@@ -44,6 +88,7 @@ function [q,T] = VD(n,a,b)
                 %}
             %Manejo de evento de círculo
             elseif ev.type == 1
+                T.balanceTree();
                 T.removeArc(ev,q,DC);
                 
             else
@@ -56,5 +101,16 @@ function [q,T] = VD(n,a,b)
         counter  = counter +1;
     end
     %}
+    vert = DC.vertices;
+    f = size(vert);
+    vx = zeros(f(1,1),2);
+    for i = 1:f(1,1)
+        vx(i,:) = vert{i,1}.pos;
+    end
+    
+    axis equal;
+    plot(vx(:,1),vx(:,2),'g.');
+    %hold on;
+    %voronoi(p(:,1),p(:,2));
     
 end

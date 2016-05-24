@@ -15,8 +15,10 @@ classdef Q < handle
         end
         %Método de inserta el evento en la lista ordenada
         function insertEvent(obj, event)
-           if isempty(obj.head) || isempty(obj.tail)
-               
+           if isempty(obj.head) && isempty(obj.tail)
+               obj.head = event;
+               obj.tail = event;
+               %{
                if isempty(obj.head)
                   obj.head = event;  
                elseif isempty(obj.tail)
@@ -31,7 +33,7 @@ classdef Q < handle
                        event.prev = obj.head;
                    end
                end
-               
+               %}
                
            else     
                 yn = event.yCoord();
@@ -94,50 +96,65 @@ classdef Q < handle
             yn = event.yCoord();
             yh = obj.head.yCoord();
             yt = obj.tail.yCoord();
-            
-            if yn == yh 
-                obj.head = obj.head.next;
-                obj.head.prev = [];
-                
-            elseif yn == yt
-                
-                obj.tail = obj.tail.prev;
-                obj.tail.next = [];
+            if obj.head == obj.tail
+                obj.head = [];
+                obj.tail = [];
             else
-                
-                u = false;
-                ei = obj.head.next;
-                ej = ei.prev;
-                ek = ei.next;
-                
-                yi = ei.yCoord();
-                while u == 0
-                    if yn == yi
-                        ej.next = ek;
-                        ek.prev = ej;
-                        ei.next = [];
-                        ei.prev = [];
-                        u = 1;
-                    else
-                        ej = ei;
-                        ei = ek;
-                        ek = ei.next;
-                        %{
-                        ei = ek;
-                        ej = ei.prev;
-                        ek = ei.next;
-                        %}
-                        yi = ei.yCoord();
-                        
+                if yn == yh 
+                    next = obj.head.next;
+                    obj.head.next = [];
+                    obj.head.prev = [];
+                    obj.head = next;
+                    obj.head.prev = [];
+                   
+
+                elseif yn == yt
+                    prev = obj.tail.prev;
+                    obj.tail.next = [];
+                    obj.tail.prev = [];
+                    obj.tail = prev;
+                    obj.tail.next = [];
+                    
+                else
+
+                    u = false;
+                    ei = obj.head.next;
+                    ej = ei.prev;
+                    ek = ei.next;
+
+                    yi = ei.yCoord();
+                    while u == 0
+                        if yn == yi
+                            ej.next = ek;
+                            ek.prev = ej;
+                            ei.next = [];
+                            ei.prev = [];
+                            u = 1;
+                        else
+                            ej = ei;
+                            ei = ek;
+                            ek = ei.next;
+                            %{
+                            ei = ek;
+                            ej = ei.prev;
+                            ek = ei.next;
+                            %}
+                            yi = ei.yCoord();
+
+                        end
                     end
-                end
-                
-            
+
+
+                end 
             end
             
-            
-        
+                
+               
+
+
         end
+            
+         
         
         
         

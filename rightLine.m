@@ -1,5 +1,5 @@
-function cd =  rightLine(start,en,point)%start, y end son eventos de sitio, point es el centro del circulo.
-    ax1 = (en.xCoord()-start.xCoord())*(point(1,2)-start.yCoord()) - (en.yCoord()- start.yCoord())*(point(1,1)- start.xCoord());
+function cd =  rightLine(start,en,point)%start, y end son nodos externos, point es el centro del circulo.
+    ax1 = (en.site.xCoord-start.site.xCoord)*(point(1,2)-start.site.yCoord) - (en.site.yCoord- start.site.yCoord)*(point(1,1)- start.site.xCoord);
     if ax1 <= 0
         cd = true;
     else

@@ -24,15 +24,14 @@ classdef Nodo < handle
         %EXTERNO)
         prev;
         next;
-        %Indica si el nodo interno es rojo 1 o  negro 0. Si el nodo es externo el color siempre es negro. 
-        color
+        
     end
     
     methods
-        function obj = Nodo(parent, arc, brkPoint,site)
+        function obj = Nodo( arc, brkPoint,site)
             %Metodo constructor de la clase
             if nargin>0
-                obj.parent = parent;
+               
                 if arc == 0
                     obj.brkPoint = brkPoint;
                     obj.isArc = 0;

@@ -1,10 +1,10 @@
 function center = centroCirculo3Puntos(pi, pj, pk)
-    pix = pi.xCoord();
-    piy = pi.yCoord();
-    pjx = pj.xCoord();
-    pjy = pj.yCoord();
-    pkx = pk.xCoord();
-    pky = pk.yCoord();
+    pix = pi.site.xCoord;
+    piy = pi.site.yCoord;
+    pjx = pj.site.xCoord;
+    pjy = pj.site.yCoord;
+    pkx = pk.site.xCoord;
+    pky = pk.site.yCoord;
     center = zeros(1,3);%Elemento 1 es la coordenada x del centro, el segundo elemento es la coordenada y del centro, el tercer elemento es el radio del circulo.
     
     center(1,1) = (1/2)*(pix^2*pjy-pix^2*pky-pjx^2*piy+pjx^2*pky+pkx^2*piy-pkx^2*pjy+piy^2*pjy-piy^2*pky-piy*pjy^2+piy*pky^2+pjy^2*pky-pjy*pky^2)/(pix*pjy-pix*pky-pjx*piy+pjx*pky+pkx*piy-pkx*pjy);
