@@ -110,7 +110,7 @@ function DC = VD(n,a,b)
     
     axis equal;
     plot(vx(:,1),vx(:,2),'g.');
-    %hold on;
-    %voronoi(p(:,1),p(:,2));
+    hold on;
+    voronoi(p(:,1),p(:,2));
     
 end
