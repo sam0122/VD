@@ -1,4 +1,4 @@
-function DC = VD(n,a,b)
+function s = VD(n,a,b)
     p = points(n,a,b);
     %{
     p = [       
@@ -107,10 +107,94 @@ function DC = VD(n,a,b)
     for i = 1:f(1,1)
         vx(i,:) = vert{i,1}.pos;
     end
+    [s, col] = size(DC.edges);
+    for i=1:s
+        ei = DC.edges{i,1};
+        v1 = ei.vertex;
+        et = ei.twin;
+        v2 = et.vertex;
+        
+        if isempty(v1) 
+            f1 = ei.face;
+            f2 = et.face;
+            
+            s1 = f1.site;
+            s2 = f2.site;
+            
+            
+        elseif isempty(v2)
+            
+        
+        else
+            v1x = v1.pos(1,1);
+            v1y = v1.pos(1,2);
+            v2x = v2.pos(1,1);
+            v2y = v2.pos(1,2);
+            
+            plot([v1x v2x],[v1y v2y], 'g');
+        end
+    end
+    
+    %{
+    Struct donde se guarda la información a  dibujar del diagrama
+    B = struct([]);
+    faces = DC.faces;
+    for i=1:n
+        
+        fi = faces{i,1};
+        e0 = fi.edge;
+        ei = e0;
+        found = 0;
+        j = 1;
+        while found == 0    
+            v = ei.vertex;
+            if isempty(v)
+                v1x = NaN;
+                v1y = NaN;
+            else
+                v1x = ei.vertex.pos(1,1);
+                v1y = ei.vertex.pos(1,2);
+            end
+            tw = ei.twin;
+            vw = tw.vertex;
+            if isempty(vw)
+                v2x = NaN;
+                v2y = NaN;
+            
+            else
+                v2x = ei.twin.vertex.pos(1,1);
+                v2y = ei.twin.vertex.pos(1,2);
+            
+            end
+        
+           
+            B(i).i.col(j,1) = v1x;
+            B(i).i.col(j,2) = v1y;
+            B(i).i.col(j,3) = v2x;
+            B(i).i.col(j,4) = v2y;
+            
+            if isnan(v1x) || isnan(v2x)
+            
+            else
+                plot([v1x v2x], [v1y v2y],'g');
+            end
+            
+    
+            ei = ei.next;
+            j  = j + 1;
+            if isequal(ei,e0) || isempty(ei)
+                found = 1;
+            end
+    
+            
+        end
+        
+    end
+    %}
     
     axis equal;
     plot(vx(:,1),vx(:,2),'g.');
     hold on;
-    voronoi(p(:,1),p(:,2));
+    %voronoi(p(:,1),p(:,2));
     
 end
