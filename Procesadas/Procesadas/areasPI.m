@@ -1,11 +1,11 @@
 function aA =  areasPI()
 %Calcula áreas de acuerdo a un análisis de imágen
 
-img = imread('SAMPLE2.jpg');
+img = imread('11X15_800_F0.8_35%D.PNG');
 gray = rgb2gray(img);
-imshow(gray);
+%imshow(gray);
 bw_img = im2bw(gray);
-%imshow(bw_img);
+imshow(bw_img);
 %{
 [B,L] = bwboundaries(bw_img,'noholes');
 stats = regionprops(L,'Area','perimeter');

@@ -1,4 +1,4 @@
-function C = genMH( np,a,b)
+function P = genMH( np,a,b)
 %Parámetro de elongación
 E = 0.8;
 %Número mínimo de contactos
@@ -117,7 +117,7 @@ A2 = 0.0001 +(0.0005 - 0.0001)*rand(nV,1);
 A2 = sort(A2,'descend');
 E2 = 0.9;
 %Número máximo de puntos usados en vacíos
-vpMax = 12; 
+vpMax = 6; 
 for j = 1:nV
     %Semieje mayor
     r1 = sqrt(A2(j,1)/(pi()*E2));
@@ -249,8 +249,8 @@ end
 
 %plot(P(:,1),P(:,2),'*');
 %hold on
-voronoi(P(:,1),P(:,2),'k');
-hold on
+%VD(,a,b);
+%hold on
 %{
 for i=1:np
 [ex , ey] = ellipse(x(i,1),y(i,1),r1(i,1),r2(i,1),in(i,1));
@@ -258,9 +258,10 @@ plot(ex,ey);
 hold on
 end
 %}
-axis equal;
+%axis equal;
 
-%Parcheo de los agregados
+%{
+Parcheo de los agregados
 [B,D] = voronoin(P);
 
 for i = 1:length(D)
@@ -275,7 +276,7 @@ for i = 1:length(D)
     end
     
 end
-
+%}
 end
 
 

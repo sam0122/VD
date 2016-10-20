@@ -11,7 +11,7 @@ classdef BST < handle
         end
         % Busca el arco justo encima del evento p, devuelve el nodo
         % asociado a dicho arco
-        function Nodo = searchNode(obj, p,Q)
+        function Nodo = searchNode(obj, p,binHeap)
             pXCoor = p.xCoord();
             linepos = p.yCoord();
             found = 0;
@@ -67,7 +67,7 @@ classdef BST < handle
             ce = Nodo.circleEvent;
             if isempty(ce) == 0
                 Nodo.circleEvent = [];
-                Q.removeEvent(ce);
+                binHeap.removeEvent();
             end
             
             
@@ -354,34 +354,34 @@ classdef BST < handle
        
         
         
-        function createCircleEvent(~,trip,Q)
+        function createCircleEvent(~,trip,binHeap)
             %Cell cuyo primer elemento es la tripleta con pi a la
             %izquierda. El segundo elemento es la tripleta con pi a la
             %derecha.           
             
             if isempty(trip{1,1})== 0
                 [conv1, cc] = convergence(trip{1,1}(1,1),trip{1,1}(1,2),trip{1,1}(1,3));
-                if conv1 == 1 %do add Q to trip{1,1}(1,2)
+                if conv1 == 1 %do add binHeap to trip{1,1}(1,2)
                     %cc = centroCirculo3Puntos(trip{1,1}(1,1),trip{1,1}(1,2),trip{1,1}(1,3));
                     r = cc(1,3);
                     % Punteros entre el nodo medio y el evento de circulo
                     % donde desaparecerá
                     ce = Evento(cc(1,1),cc(1,2)-r,1,trip{1,1}(1,2),r,[]);
                     trip{1,1}(1,2).circleEvent = ce;
-                    Q.insertEvent(ce);
+                    binHeap.insertEvent(ce);
                 end
                 
             end
             if isempty(trip{1,2})== 0
                 [conv2, cc] = convergence(trip{1,2}(1,1),trip{1,2}(1,2),trip{1,2}(1,3));
-                if conv2 == 1 %do add Q to trip{1,1}(1,2)
+                if conv2 == 1 %do add binHeap to trip{1,1}(1,2)
                     %cc = centroCirculo3Puntos(trip{1,2}(1,1),trip{1,2}(1,2),trip{1,2}(1,3));
                     r = cc(1,3);
                     % Punteros entre el nodo medio y el evento de circulo
                     % donde desaparecerá
                     ce = Evento(cc(1,1),cc(1,2)-r,1,trip{1,2}(1,2),r,[]);
                     trip{1,2}(1,2).circleEvent = ce;
-                    Q.insertEvent(ce);
+                    binHeap.insertEvent(ce);
                 end
                 
             end
@@ -389,7 +389,7 @@ classdef BST < handle
         end
         
         %Elimina el arco que va a desaparecer cuando ocurre el evento de círculo ce 
-        function  removeArc(obj, ce, Q,D)
+        function  removeArc(obj, ce, binHeap,D)
             %1 Actualización del árbol al eliminar pi
             %Nodo(arco) que va a desaparecer y sus nodos anterior y
             %siguiente
@@ -402,11 +402,11 @@ classdef BST < handle
             %Remover los eventos de círculo asociados a los nodos
             %adyacentes
             if isempty(ecPrev) == 0
-                     Q.removeEvent(ecPrev);
+                     ecPrev.valido = false;
                      pj.circleEvent = [];
             end
             if isempty(ecNext) == 0
-                     Q.removeEvent(ecNext);
+                     ecNext.valido = false;
                      pk.circleEvent = [];
             end
             %Nodos que representan los brkpoints y los brkpoints siguientes
@@ -444,8 +444,7 @@ classdef BST < handle
             %de los bordes) como el vértice.
             e1tw.vertex = v;
             e2tw.vertex = v;
-            %Remueve el evento de círculo de la lista de eventos Q.
-            Q.removeEvent(ce);
+            %Remueve el evento de círculo de la lista de eventos binHeap.
             pi.circleEvent = [];
             D.addVertex(v);
             
@@ -489,7 +488,7 @@ classdef BST < handle
             end
             
             
-            obj.createCircleEvent(trip,Q);
+            obj.createCircleEvent(trip,binHeap);
             
             
             
@@ -533,11 +532,11 @@ classdef BST < handle
             ecNext = pNext.circleEvent;
             
             if isempty(ecPrev) == 0
-                     Q.removeEvent(ecPrev);
+                     binHeap.removeEvent(ecPrev);
                      pPrev.circleEvent = [];
             end
             if isempty(ecNext) == 0
-                     Q.removeEvent(ecNext);
+                     binHeap.removeEvent(ecNext);
                      pNext.circleEvent = [];
             end
             
@@ -557,8 +556,8 @@ classdef BST < handle
             %de los bordes) como el vértice.
             e1tw.vertex = v;
             e2tw.vertex = v;
-            %Remueve el evento de círculo de la lista de eventos Q.
-            Q.removeEvent(ce);
+            %Remueve el evento de círculo de la lista de eventos binHeap.
+            binHeap.removeEvent(ce);
             pi.circleEvent = [];
             D.addVertex(v);
             
@@ -592,7 +591,7 @@ classdef BST < handle
             trip =  cell(1,2);
             trip{1,1} = [pPrev.prev, pPrev, pNext];
             trip{1,2} = [pPrev, pNext, pNext.next];
-            obj.createCircleEvent(trip,Q);
+            obj.createCircleEvent(trip,binHeap);
             
             %{
             %Se toman los nodos (internos y externos) asociados al arco que
@@ -617,8 +616,8 @@ classdef BST < handle
             %de los bordes) como el vértice.
             e1tw.vertex = v;
             e2tw.vertex = v;
-            %Remueve el evento de círculo de la lista de eventos Q.
-            Q.removeEvent(ce);
+            %Remueve el evento de círculo de la lista de eventos binHeap.
+            binHeap.removeEvent(ce);
             px.circleEvent = [];
             D.addVertex(v);
             
@@ -639,7 +638,7 @@ classdef BST < handle
                 end
                 ev = pr.circleEvent;
                 if isempty(ev) == 0
-                     Q.removeEvent(ev);
+                     binHeap.removeEvent(ev);
                      pr.circleEvent = [];
                 end
                 
@@ -661,7 +660,7 @@ classdef BST < handle
                 end
                 ev = pl.circleEvent;
                 if isempty(ev) == 0
-                    Q.removeEvent(ev);
+                    binHeap.removeEvent(ev);
                     pl.circleEvent = [];
                 end
                 %Rutina para eliminar todos los eventos de círculo asociados a px
@@ -685,7 +684,7 @@ classdef BST < handle
                 %Rutina para eliminar todos los eventos de círculo asociados a px
                 ev = pr2.circleEvent;
                 if isempty(ev)== 0
-                     Q.removeEvent(ev);
+                     binHeap.removeEvent(ev);
                      pr2.circleEvent = [];
                 end
                          
@@ -748,7 +747,7 @@ classdef BST < handle
                 %Rutina para eliminar todos los eventos de círculo asociados a px
                 ev = pl2.circleEvent;
                 if isempty(ev) == 0
-                    Q.removeEvent(ev);                
+                    binHeap.removeEvent(ev);                
                     pl2.circleEvent = [];
                 end
                 

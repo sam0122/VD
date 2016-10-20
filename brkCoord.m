@@ -1,7 +1,7 @@
 function x = brkCoord( pjx,pjy,pix,piy,ly )
-%Función ñque calcula la coordenada de los dos brkpoints que se generan
-%cuando ocurre un nuevo evento de sitio pi;
-
+%Función que calcula la coordenada del breakpoint entre dos puntos. Puede
+%no ser una función óptima.
+%
 k1 = 2*(pjy - ly);
 k2 = 2*(piy - ly);
 

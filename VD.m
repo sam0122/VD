@@ -1,5 +1,5 @@
-function s = VD(n,a,b)
-    p = points(n,a,b);
+function s = VD(n,ancho,alto)
+    p = points(n,ancho,alto);
     %{
     p = [       
           
@@ -43,7 +43,8 @@ function s = VD(n,a,b)
          0.76 3.08
          3    2.54];
     %}
-    q = Q([],[]);
+    %q = Q([],[]);
+    q = binHeap(n);
     DC = DCEL();
     %Plot de los sitios
     plot(p(:,1),p(:,2),'.');
@@ -52,6 +53,7 @@ function s = VD(n,a,b)
     %e = Evento(p(1,1),p(1,2),0,[],[]);
     %q.head = e;
     %Iniciar estructuras de datos Q y DCEL
+    p = sortrows(p,-2);
     for i = 1:n(1,1)
         e = Evento(p(i,1),p(i,2),0,[],[],[]);
         q.insertEvent(e);
@@ -60,22 +62,22 @@ function s = VD(n,a,b)
         e.face = f;
     end
     %Iniciar árbol binario T
-    head = q.head;
+    head = q.removeEvent();
     root = Nodo(1,[],head);
     T = BST(root);
-    q.removeEvent(head);
+     
     %Algoritmo de Fortune
     counter = 0;
     finish = 0;
     while finish == 0
-        if isempty(q.head) && isempty(q.tail)
+        if q.currentSize == 0
             finish = 1;
         else 
-            ev = q.head;
+            ev = q.removeEvent();
             
             %Manejo de evento de sitio
             if ev.type == 0
-                q.removeEvent(ev);
+                
                 arcs = T.insertArc(ev,q,DC);
                 trip = triples(arcs);
                 T.createCircleEvent(trip,q);
@@ -87,13 +89,10 @@ function s = VD(n,a,b)
                 end
                 %}
             %Manejo de evento de círculo
-            elseif ev.type == 1
+            elseif ev.type == 1 && ev.valido == true
                 T.balanceTree();
                 T.removeArc(ev,q,DC);
                 
-            else
-                
-                error('Tipo de evento no permitido');
             end
             
             
@@ -101,30 +100,104 @@ function s = VD(n,a,b)
         counter  = counter +1;
     end
     %}
+    %
+%Rutina para el dibujo de los vértices
     vert = DC.vertices;
     f = size(vert);
     vx = zeros(f(1,1),2);
     for i = 1:f(1,1)
         vx(i,:) = vert{i,1}.pos;
     end
+    %
     [s, col] = size(DC.edges);
+    k = 1;
+    %{
+    Revisa si los vértices existentes se encuentran dentro del BBx
+    for i = 1:s
+        ei = DC.edges{i,1};
+        v1 = ei.vertex;
+        et = ei.twin;
+        v2 = et.vertex;
+        
+        if ~isempty(v1) && ~isempty(v2)
+           if (v1.pos(1,1) > ancho || v1.pos(1,1) < 0 || v1.pos(1,2) > alto || v1.pos(1,2) < 0) && (v2.pos(1,1) > ancho || v2.pos(1,1) < 0 || v2.pos(1,2) > alto || v2.pos(1,2) < 0)
+                %Falta :Eliminar ambos vértices
+                %Caso donde el borde se encuentra completamnete fuera del box.
+                %Ambos vertices estpan fuera. No se agrega dicho borde al nuevo
+                %cell array
+                
+            elseif v1.pos(1,1) > ancho || v1.pos(1,1) < 0 || v1.pos(1,2) > alto || v1.pos(1,2) < 0  
+                %Caso donde el vertice se encuentra fuera del box. Deberia
+                %convertir el borde en una línea semi-infinita, eliminando
+                %el borde exterior
+                ei.vertex = [];
+                edges2{k,1} = ei;
+                k = k + 1;
+            elseif v2.pos(1,1) > ancho || v2.pos(1,1) < 0 || v2.pos(1,2) > alto || v2.pos(1,2) < 0
+                %Caso donde el vertice se encuentra fuera del box. Deberia
+                %convertir el borde en una línea semi-infinita, eliminando
+                %el borde exterior
+                ei.twin.vertex = [];
+                edges2{k,1} = ei;
+                k = k + 1;
+           else
+                %El borde se encuentra completamente dentro del box
+                edges2{k,1} = ei;
+                k = k + 1;
+            end
+        
+        elseif ~isempty(v1) && isempty(v2)
+            %Analiza los casos donde un vértice no existe y el otro se
+            %encuentra por fuera.
+             if v1.pos(1,1) > ancho || v1.pos(1,1) < 0 || v1.pos(1,2) > alto || v1.pos(1,2) < 0
+             else
+                edges2{k,1} = ei;
+                k = k + 1;    
+             end
+        elseif ~isempty(v2) && isempty(v1)
+            if v2.pos(1,1) > ancho || v2.pos(1,1) < 0 || v2.pos(1,2) > alto || v2.pos(1,2) < 0
+            
+            else 
+                edges2{k,1} = ei;
+                k = k + 1;
+            end
+            
+        end
+        
+    end
+    DC.edges = edges2;
+    [s, col] = size(DC.edges);
+    %Rutina para el dibujo de los bordes
     for i=1:s
         ei = DC.edges{i,1};
         v1 = ei.vertex;
         et = ei.twin;
         v2 = et.vertex;
         
+        f1 = ei.face;
+        f2 = et.face;
+
+        s1 = f1.site;
+        s2 = f2.site;
+        
+      
         if isempty(v1) 
-            f1 = ei.face;
-            f2 = et.face;
-            
-            s1 = f1.site;
-            s2 = f2.site;
-            
-            
+           
+           ccomp = boundBox(ancho,alto,s1,s2,v2);
+           v1x = v2.pos(1,1);
+           v1y = v2.pos(1,2);
+           v2x = ccomp(1,1);
+           v2y = ccomp(1,2);
+           plot([v1x v2x],[v1y v2y], 'g');
+                      
         elseif isempty(v2)
             
-        
+           ccomp = boundBox(ancho,alto,s1,s2,v1);
+           v1x = ccomp(1,1);
+           v1y = ccomp(1,2);
+           v2x = v1.pos(1,1);
+           v2y = v1.pos(1,2);
+           plot([v1x v2x],[v1y v2y], 'g');
         else
             v1x = v1.pos(1,1);
             v1y = v1.pos(1,2);
@@ -134,7 +207,7 @@ function s = VD(n,a,b)
             plot([v1x v2x],[v1y v2y], 'g');
         end
     end
-    
+    %}
     %{
     Struct donde se guarda la información a  dibujar del diagrama
     B = struct([]);
@@ -195,6 +268,7 @@ function s = VD(n,a,b)
     axis equal;
     plot(vx(:,1),vx(:,2),'g.');
     hold on;
+    plot([0 ancho ancho 0 0], [0 0 alto alto 0], 'g');
     %voronoi(p(:,1),p(:,2));
     
 end

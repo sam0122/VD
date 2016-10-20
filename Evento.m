@@ -1,8 +1,8 @@
 classdef Evento < handle
     properties
         %Coordenadas del evento, punto más bajo del círculo
-        x;
-        y;
+        xCoord;
+        yCoord;
         r;%Radio del círculo
         type; %puede ser de sitio "0" o  de circulo "1".
         
@@ -10,32 +10,32 @@ classdef Evento < handle
         
         nodo; % Si el evento es un evento de circulo, nodo es un puntero al arco que desaparecerá si el evento ocurre.
         %Control para la lista prioritaria.
-        prev;
-        next;
+        %Flag para determinar si el evento de círculo es válido o no.
+        valido;
     end
     
     methods
-        function obj = Evento(xC, yC, t,nodo, radio, fc)
+        %Se hizó una simplificación al método constructor. Revisar en los
+        %otros métodos porque se redujo el número de parámetros de entrada
+        %necesarios.
+        function obj = Evento(xC, yC)
             
-                obj.x = xC;
-                obj.y = yC;
-                obj.type = t;
-                obj.nodo = nodo;
-                obj.r = radio;
-                obj.face = fc;
-                
-                obj.prev = [];
-                obj.next = [];
-               
+                obj.xCoord = xC;
+                obj.yCoord = yC;
+                obj.type = 0;
+                obj.nodo = [];
+                obj.r = [];
+                obj.face = [];
+                obj.valido = true;
             
         end 
         
-        function xC = xCoord(obj)
-            xC = obj.x;
+        function xC = xCoordFun(obj)
+            xC = obj.xCoord;
         end
         
-         function yC = yCoord(obj)
-            yC = obj.y;
+         function yC = yCoordFun(obj)
+            yC = obj.yCoord;
         end
         
         function t = giveType(obj)
