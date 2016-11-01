@@ -37,7 +37,7 @@ classdef AVL < handle
         end
         %Función para insertar un conjunto de nodos al tiempo. Asociada a
         %Voronoi
-        function putBulk(obj, siteEvent, upperNode)
+        function nodeNewArc = putBulk(obj, siteEvent, upperNode, leftEdge, rightEdge)
             %Tomar los sitios del arco existente
             sites = upperNode.sites;
             existingSite = sites(1,1);
@@ -51,13 +51,15 @@ classdef AVL < handle
                 
                 upperNode.sites = [siteEvent existingSite];
                 upperNode.balanceFactor = 1;
-                
+                %Conexión con el nuevo borde que traza
+                upperNode.edge = rightEdge;
                 %Nuevo nodo de brkPoint
                 
                 newBrk = Node([existingSite siteEvent]);
                 newLeft = Node([existingSite 0 ]);
                 newRight = Node([siteEvent 0]);
-                
+                %Conexión con el nuevo borde que traza
+                newBrk.edge = leftEdge;
                 %Unión entre nodos nuevos
                 
                 newLeft.parent = newBrk;
@@ -67,13 +69,15 @@ classdef AVL < handle
                 newBrk.leftChild = newLeft;
                 newBrk.rightChild = newRight;
                 upperNode.leftChild = newBrk;
-                
+                %Devolver el nodo que representa al arco nuevo.
+                nodeNewArc = newRight;
                 %Update balance
                 obj.updateBalanceBulk(upperNode)
                 
+                
             else
                 
-                %Nuevo nodo iquierdo y modificación de la información de
+                %Nuevo nodo izquierdo y modificación de la información de
                 %upperNode
                 upperNodeLeft = Node([existingSite 0]);
                 upperNodeLeft.parent = upperNode;
@@ -81,12 +85,16 @@ classdef AVL < handle
                 
                 upperNode.sites = [existingSite siteEvent];
                 upperNode.balanceFactor = -1;
+                 %Conexión con el nuevo borde que traza
+                upperNode.edge = leftEdge;
                 
                 %Nuevo nodo de brkPoint
                 
                 newBrk = Node([siteEvent existingSite]);
                 newLeft = Node([siteEvent 0 ]);
                 newRight = Node([existingSite 0]);
+                %Conexión con el nuevo borde que traza
+                newBrk.edge = rightEdge;
                 
                 %Unión entre nodos nuevos
                 
@@ -97,7 +105,8 @@ classdef AVL < handle
                 newBrk.leftChild = newLeft;
                 newBrk.rightChild = newRight;
                 upperNode.rightChild = newBrk;
-                
+                %Devolver el nodo que representa al arco nuevo.
+                nodeNewArc = newLeft;
                 %Update balance
                 obj.updateBalanceBulk(upperNode)
 

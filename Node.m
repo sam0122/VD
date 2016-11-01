@@ -207,6 +207,59 @@ classdef Node < handle
             end
                 
         end
+        %Métodos para encontrar el nodo arco contiguo al nodo input
+        function succ =  findNext(obj)
+            if obj.isLeftChild()
+                succ = obj.parent.rightChild;
+            else
+                currentNode = obj.parent;
+                succ = currentNode.findNext_();
+            end
+            
+        end
+        function succ = findNext_(obj)
+            if obj.isLeftChild()
+                succ = obj.parent.rightChild.goLeft();
+            elseif obj.isRoot()
+                succ = [];
+            else    
+                succ = obj.parent.findNext_();
+            end
+        end
+        function leftNode = goLeft(obj)
+            if obj.isLeaf()
+                leftNode = obj;
+            else
+                leftNode = obj.leftChild.goLeft();
+            end
+            
+        end
+        %Métodos para encontrar el nodo anterior al nodo input
+        function prev = findPrev(obj)
+            if obj.isRightChild()
+                prev = obj.parent.leftChild;
+            else
+                currentNode = obj.parent;
+                prev = currentNode.findPrev_();
+            end
+        end
+        function prev = findPrev_(obj)
+            if obj.isRightChild()
+                prev = obj.parent.leftChild.goRight();
+            elseif obj.isRoot()
+                prev = [];
+            else
+                prev = obj.parent.findPrev_();
+            end
+        end
+        function rightNode = goRight(obj)
+            if obj.isLeaf()
+                rightNode = obj;
+            else
+                rightNode = obj.rightChild.goRight();
+            end
+            
+        end
         
         
     end

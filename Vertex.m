@@ -3,14 +3,16 @@ classdef Vertex < handle
         
     properties
         edge; %Objeto de clase Edge que tienen este objeto como vértice de inicio
-        pos; %Array (x,y) que representa las coordenadas del vertice
+        x;%Coordenada x
+        y;%Coordenada y
     end
     
     methods
         %Método constructor de la clase
-        function obj = Vertex(edge, coord)
+        function obj = Vertex(edge, x, y)
              obj.edge= edge;
-             obj.pos= coord;
+             obj.x = x;
+             obj.y = y;
         end
     end
     
