@@ -14,14 +14,14 @@ function [conv, center] = convergence(pl, pm, pr)
         %pl = a
         %pm = b
         %pr = c
-  syd = 2*((pl.site.yCoord - pm.site.yCoord)*(pm.site.xCoord - pr.site.xCoord) - (pm.site.yCoord - pr.site.yCoord)*(pl.site.xCoord - pm.site.xCoord));
+  syd = 2*((pl.sites{1,1}.yCoord - pm.sites{1,1}.yCoord)*(pm.sites{1,1}.xCoord - pr.sites{1,1}.xCoord) - (pm.sites{1,1}.yCoord - pr.sites{1,1}.yCoord)*(pl.sites{1,1}.xCoord - pm.sites{1,1}.xCoord));
     if syd > 0 
         
-        syn = (pr.site.xCoord^2 + pr.site.yCoord^2 - pm.site.xCoord^2 - pm.site.yCoord^2)*(pl.site.xCoord - pm.site.xCoord) - (pm.site.xCoord^2 + pm.site.yCoord^2 - pl.site.xCoord^2 - pl.site.yCoord^2)*(pm.site.xCoord - pr.site.xCoord); 
+        syn = (pr.sites{1,1}.xCoord^2 + pr.sites{1,1}.yCoord^2 - pm.sites{1,1}.xCoord^2 - pm.sites{1,1}.yCoord^2)*(pl.sites{1,1}.xCoord - pm.sites{1,1}.xCoord) - (pm.sites{1,1}.xCoord^2 + pm.sites{1,1}.yCoord^2 - pl.sites{1,1}.xCoord^2 - pl.sites{1,1}.yCoord^2)*(pm.sites{1,1}.xCoord - pr.sites{1,1}.xCoord); 
         center(1,2) = syn/syd;
-        sxn = (pr.site.xCoord^2 + pr.site.yCoord^2 - pm.site.xCoord^2 - pm.site.yCoord^2)*(pl.site.yCoord - pm.site.yCoord) - (pm.site.xCoord^2 + pm.site.yCoord^2 - pl.site.xCoord^2 - pl.site.yCoord^2)*(pm.site.yCoord - pr.site.yCoord); 
+        sxn = (pr.sites{1,1}.xCoord^2 + pr.sites{1,1}.yCoord^2 - pm.sites{1,1}.xCoord^2 - pm.sites{1,1}.yCoord^2)*(pl.sites{1,1}.yCoord - pm.sites{1,1}.yCoord) - (pm.sites{1,1}.xCoord^2 + pm.sites{1,1}.yCoord^2 - pl.sites{1,1}.xCoord^2 - pl.sites{1,1}.yCoord^2)*(pm.sites{1,1}.yCoord - pr.sites{1,1}.yCoord); 
         center(1,1) = sxn/(-1*syd);
-        center(1,3) = sqrt((center(1,1) - pl.site.xCoord)^2 + (center(1,2) - pl.site.yCoord)^2);
+        center(1,3) = sqrt((center(1,1) - pl.sites{1,1}.xCoord)^2 + (center(1,2) - pl.sites{1,1}.yCoord)^2);
         conv = true;
     else
 

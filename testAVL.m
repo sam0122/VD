@@ -16,8 +16,8 @@ nodAr{11,1} = Node(38);
 nodAr = cell(50000,1);
 val = 5000*rand(50000,1);
 %}
-T = AVL();
-
+%T = AVL();
+%{
 %n = size(nodAr);
 for i = 1:3
     %nodAr{i,1} = Node(i);
@@ -73,4 +73,20 @@ T.delete(nodAr{2,1});
 T.delete(nodAr{4,1});
 %}
 
-
+%Prueba de putBulk
+n = 6;
+VD = Voronoi(n);
+%Sitios
+site1 = Evento(0.5, 0.5);
+site2 = Evento(1,1);
+site3 = Evento(0.5,2);
+site4 = Evento(1.5,1.5);
+site5 = Evento(1.6,0.2);
+site6 = Evento(2, 1.8);
+%Añadir sitio a sitio.
+nodo1 = Node({site3 0});
+VD.avl.put(nodo1);
+upperNode = VD.avl.getUpperNode(site6.xCoord, site6.yCoord);
+VD.avl.putBulk(site6,upperNode,[],[]);
+upperNode = VD.avl.getUpperNode(site4.xCoord, site4.yCoord);
+VD.avl.putBulk(site4,upperNode,[],[]);

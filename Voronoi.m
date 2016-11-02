@@ -16,7 +16,7 @@ classdef Voronoi < handle
         %Constructor, n es el número de sitios de Voronoi
         function obj = Voronoi(n)
             obj.avl = AVL();
-            obj.dcel = DCEL;
+            obj.dcel = DCEL();
             obj.heap = binHeap(n);
         end
         
@@ -25,7 +25,7 @@ classdef Voronoi < handle
         function handleSiteEvent(obj, siteEvent)
              %Si el árbol está vacío lo inicializa
              if obj.avl.size == 0
-                newRoot = Node([siteEvent 0]);
+                newRoot = Node({siteEvent 0});
                 obj.avl.put(newRoot);
                 %Creación del polígono inicial
                 newFace = Face([],siteEvent);
@@ -37,7 +37,7 @@ classdef Voronoi < handle
                  upperNode = obj.avl.getUpperNode(siteEvent.xCoord, siteEvent.yCoord);
                  %Guarda el sitio relacionado con el nodo arco
                  upperNodeSites = upperNode.sites;
-                 existingSite = upperNodeSites(1,1);
+                 existingSite = upperNodeSites{1,1};
                  existingFace = existingSite.face;
                  %Unir los nuevos brkPoints con los nuevos vértices que
                  %empiezan a trazar
@@ -78,7 +78,7 @@ classdef Voronoi < handle
         
         function handleCircleEvent(obj, circleEvent)
         %Eliminar nodo del árbol
-            nodeEliminate = circleEvent.node;
+            nodeEliminate = circleEvent.nodo;
             parentEliminate = nodeEliminate.parent;
             %Guardar información importante relacionada al nodo que se va a
             %eliminar
@@ -88,32 +88,34 @@ classdef Voronoi < handle
             %Actualizar la información del segundo padre y se guarda la
             %información de los bordes que estaban siendo trazados
             if nodeEliminate.isLeftChild()
-                secondParent.sites(1,2) = nextNode.sites(1,1);
+                secondParent.sites{1,2} = nextNode.sites{1,1};
                 rightEdge = nodeEliminate.parent.edge;
                 leftEdge = secondParent.edge;
             else
-                secondParent.sites(1,1) = prevNode.sites(1,1);
+                secondParent.sites{1,1} = prevNode.sites{1,1};
                 rightEdge = secondParent.edge;
                 leftEdge = nodeEliminate.parent.edge;
             end
             %Eliminar eventos de círculo asociados
             nextCircleEvent = nextNode.circleEvent;
-            nextCircleEvent.valid = false;
+            nextCircleEvent.valido = false;
             prevCircleEvent = prevNode.circleEvent;
-            prevCircleEvent.valid = false;
+            prevCircleEvent.valido = false;
             %Crear vértice nuevo
             r = circleEvent.r;
-            xV = circleEvent.x;
-            yV = circleEvent.y + r;
+            xV = circleEvent.xCoord;
+            yV = circleEvent.yCoord + r;
             %Crear el vértice y bordee.
             newVertex = Vertex([],xV,yV);
             newEdge = Edge(newVertex,[]);
             newEdgeTwin = Edge([],[]);
             newEdge.twin = newEdgeTwin;
             newEdgeTwin.twin = newEdge;
+            %Añadir a la estructura temporal
+            obj.dcel.addVertex(newVertex);
             %Unir con caras existentes
-            leftSite = prevNode.sites(1,1);
-            rightSite = nextnode.sites(1,1);
+            leftSite = prevNode.sites{1,1};
+            rightSite = nextNode.sites{1,1};
             leftFace = leftSite.face;
             rightFace = rightSite.face;
             newEdge.face = rightFace;
@@ -138,7 +140,7 @@ classdef Voronoi < handle
             nextNextNode = nextNode.findNext();
             obj.checkCircleEvent(prevNode, nextNode, nextNextNode);
             %Tripleta 2 prevPrevNode, prevNode,nextNode
-            prevPrevNode = prevnode.findPrev();
+            prevPrevNode = prevNode.findPrev();
             obj.checkCircleEvent(prevPrevNode, prevNode,nextNode);
             
             
@@ -154,7 +156,7 @@ classdef Voronoi < handle
                          circleEvent = Evento(cc(1,1),cc(1,2)-r);
                          circleEvent.r = r;
                          circleEvent.type = 1;
-                         circleEvent.node = node2;
+                         circleEvent.nodo = node2;
                          node2.circleEvent = circleEvent;
                          %Agregar a la lista prioritaria
                          obj.heap.insertEvent(circleEvent);

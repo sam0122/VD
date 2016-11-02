@@ -8,9 +8,7 @@ classdef Node < handle
         rightChild;
         %Puntero al nodo padre
         parent;
-        %Arreglo con la pareja de sitios cuya intersección forma el brkPoint 
-        %Para las pruebas se pueden considerar como doubles, si funciona
-        %deben cambiarse por elementos de tipo evento
+        %Cell con la pareja de sitios cuya intersección forma el brkPoint 
         sites;
         %Evento de círculo donde desaparecerá el nodo hoja. Debe
         %reemplazarse más adelante por un elemento de tipo Evento(círculo).
@@ -41,11 +39,11 @@ classdef Node < handle
         %ultima función puede no estar optimizada.
         function key = key(obj, linePos)
             if obj.isLeaf()            
-                site =  obj.sites(1,1);
+                site =  obj.sites{1,1};
                 key = site.xCoord;
             else
-                p1 = obj.brkPoint(1,1);
-                p2 = obj.brkPoint(1,2);
+                p1 = obj.sites{1,1};
+                p2 = obj.sites{1,2};
                 
                 key = brkCoord(p1.xCoord,p1.yCoord,p2.xCoord,p2.yCoord ,linePos);
             end

@@ -16,8 +16,8 @@ classdef binHeap < handle
         function percUp(obj,i)
             div = fix(i/2);
             while div > 0
-                y1 = obj.heapList{i,1}.y;
-                y2 = obj.heapList{div,1}.y;
+                y1 = obj.heapList{i,1}.yCoord;
+                y2 = obj.heapList{div,1}.yCoord;
                 if y1 > y2
                     tmp = obj.heapList{div,1};
                     obj.heapList{div,1} = obj.heapList{i,1};
@@ -46,8 +46,8 @@ classdef binHeap < handle
             
             while (i*2) <= obj.currentSize
                 mc = obj.maxChild(i);
-                y1 = obj.heapList{i,1}.y;
-                y2 = obj.heapList{mc,1}.y;
+                y1 = obj.heapList{i,1}.yCoord;
+                y2 = obj.heapList{mc,1}.yCoord;
                 if y1  < y2
                     tmp = obj.heapList{i,1};
                     obj.heapList{i,1} = obj.heapList{mc,1};
@@ -63,8 +63,8 @@ classdef binHeap < handle
             if (i*2 + 1) > obj.currentSize
                 ind = i*2;
             else
-                y1 = obj.heapList{i*2,1}.y;
-                y2 = obj.heapList{i*2 + 1,1}.y;
+                y1 = obj.heapList{i*2,1}.yCoord;
+                y2 = obj.heapList{i*2 + 1,1}.yCoord;
                 if y1 > y2
                     ind = i*2;
                 else

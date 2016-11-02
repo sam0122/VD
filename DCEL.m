@@ -10,6 +10,8 @@ classdef DCEL < handle
         %vertices;
         faces;
         size;
+        vertex %Almacenamiento temporal de vértices, solo ppara debugging.
+        vsize;
     end
     
     methods
@@ -19,7 +21,9 @@ classdef DCEL < handle
             %obj.edges = {};
             %obj.vertices = {};
             obj.faces = {};
-            obj.size = 0; 
+            obj.size = 0;
+            obj.vertex = {};
+            obj.vsize = 0;
         end
         %Método que añade un nuevo borde 
         %{
@@ -69,14 +73,12 @@ classdef DCEL < handle
             
         end
         
-        %{
+        
         %Método que añade un nuevo vértice
         function addVertex(obj,vertex)
             
-           s = size(obj.vertices);
-           i = s(1,1) + 1;
-           j = 1;
-           obj.vertices{i,j} = vertex;
+           obj.vsize = obj.vsize + 1;
+           obj.vertex{obj.vsize,1} = vertex;
            
         end
         %}

@@ -40,24 +40,24 @@ classdef AVL < handle
         function nodeNewArc = putBulk(obj, siteEvent, upperNode, leftEdge, rightEdge)
             %Tomar los sitios del arco existente
             sites = upperNode.sites;
-            existingSite = sites(1,1);
+            existingSite = sites{1,1};
             
             if upperNode.isLeftChild()
                 %Nuevo nodo derecho y modificación de la información de
                 %upperNode
-                upperNodeRight = Node([existingSite 0]);
+                upperNodeRight = Node({existingSite 0});
                 upperNodeRight.parent = upperNode;
                 upperNode.rightChild = upperNodeRight;
                 
-                upperNode.sites = [siteEvent existingSite];
+                upperNode.sites = {siteEvent existingSite};
                 upperNode.balanceFactor = 1;
                 %Conexión con el nuevo borde que traza
                 upperNode.edge = rightEdge;
                 %Nuevo nodo de brkPoint
                 
-                newBrk = Node([existingSite siteEvent]);
-                newLeft = Node([existingSite 0 ]);
-                newRight = Node([siteEvent 0]);
+                newBrk = Node({existingSite siteEvent});
+                newLeft = Node({existingSite 0 });
+                newRight = Node({siteEvent 0});
                 %Conexión con el nuevo borde que traza
                 newBrk.edge = leftEdge;
                 %Unión entre nodos nuevos
@@ -79,20 +79,20 @@ classdef AVL < handle
                 
                 %Nuevo nodo izquierdo y modificación de la información de
                 %upperNode
-                upperNodeLeft = Node([existingSite 0]);
+                upperNodeLeft = Node({existingSite 0});
                 upperNodeLeft.parent = upperNode;
                 upperNode.leftChild = upperNodeLeft;
                 
-                upperNode.sites = [existingSite siteEvent];
+                upperNode.sites = {existingSite siteEvent};
                 upperNode.balanceFactor = -1;
                  %Conexión con el nuevo borde que traza
                 upperNode.edge = leftEdge;
                 
                 %Nuevo nodo de brkPoint
                 
-                newBrk = Node([siteEvent existingSite]);
-                newLeft = Node([siteEvent 0 ]);
-                newRight = Node([existingSite 0]);
+                newBrk = Node({siteEvent existingSite});
+                newLeft = Node({siteEvent 0 });
+                newRight = Node({existingSite 0});
                 %Conexión con el nuevo borde que traza
                 newBrk.edge = rightEdge;
                 
@@ -112,6 +112,7 @@ classdef AVL < handle
 
                 
             end
+            obj.size = obj.size + 4;
             
             
         end
@@ -257,7 +258,7 @@ classdef AVL < handle
         end
         %Función auxiliar para encontrar el arco superior
         function node = getUpperNode_(obj, key, currentNode,linePos)
-            if currentNode.isArc()
+            if currentNode.isLeaf()
                 node = currentNode;
             else    
                 if key < currentNode.key(linePos)
