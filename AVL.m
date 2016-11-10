@@ -27,9 +27,9 @@ classdef AVL < handle
     %especiales para voronoi
  
         %Función para insertar un nodo a la vez
-        function put(obj, node)
+        function put(obj, node, linePos)
             if ~isempty(obj.root)%Si no está vacío llama la función auxiliar put_()
-                obj.put_(node, obj.root);
+                obj.put_(node, obj.root, linePos);
             else %Si está vacío el nodo se convierte en la raíz
                 obj.root = node;
             end
@@ -37,83 +37,108 @@ classdef AVL < handle
         end
         %Función para insertar un conjunto de nodos al tiempo. Asociada a
         %Voronoi
-        function nodeNewArc = putBulk(obj, siteEvent, upperNode, leftEdge, rightEdge)
+        function nodeNewArc = putBulk(obj, newSite, upperNode, leftEdge, rightEdge)
             %Tomar los sitios del arco existente
+            %linePos = newSite.yCoord;
             sites = upperNode.sites;
             existingSite = sites{1,1};
+            %{
+            upperNode.sites = {newSite existingSite};
+            upperNodeRight = Node({existingSite 0});
+            obj.put(upperNodeRight, linePos); 
+            upperNode.edge = rightEdge;
+            newBrk = Node({existingSite newSite});
+            obj.put(newBrk,linePos);
+            newBrk.edge = leftEdge;
+            newLeft = Node({existingSite 0 });
+            obj.put(newLeft,linePos);
+            newRight = Node({newSite 0});
+            obj.put(newRight,linePos);
+            nodeNewArc = newRight;
+            %}
             
             if upperNode.isLeftChild()
                 %Nuevo nodo derecho y modificación de la información de
                 %upperNode
+                upperNode.sites = {newSite existingSite};
                 upperNodeRight = Node({existingSite 0});
                 upperNodeRight.parent = upperNode;
                 upperNode.rightChild = upperNodeRight;
-                
-                upperNode.sites = {siteEvent existingSite};
-                upperNode.balanceFactor = 1;
                 %Conexión con el nuevo borde que traza
                 upperNode.edge = rightEdge;
-                %Nuevo nodo de brkPoint
                 
-                newBrk = Node({existingSite siteEvent});
-                newLeft = Node({existingSite 0 });
-                newRight = Node({siteEvent 0});
+                %Nuevo nodo de brkPoint
+                newBrk = Node({existingSite newSite});
+                newBrk.parent = upperNode;
+                upperNode.leftChild = newBrk;
+                obj.updateBalance(upperNode);
                 %Conexión con el nuevo borde que traza
                 newBrk.edge = leftEdge;
-                %Unión entre nodos nuevos
+                %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
+                if ~upperNode.hasBothChildren()    
+                    error('Problema al insertar la primera pareja de nodos');
+                end
                 
+                %Nodos arcos restantes
+                %Arco izquierdo
+                newLeft = Node({existingSite 0 });
                 newLeft.parent = newBrk;
-                newRight.parent = newBrk;
-                newBrk.parent = upperNode;
-                
                 newBrk.leftChild = newLeft;
+                %Arco derecho
+                newRight = Node({newSite 0});
+                newRight.parent = newBrk;
                 newBrk.rightChild = newRight;
-                upperNode.leftChild = newBrk;
+                obj.updateBalance(newBrk);
                 %Devolver el nodo que representa al arco nuevo.
                 nodeNewArc = newRight;
-                %Update balance
-                obj.updateBalanceBulk(upperNode)
-                
+                %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
+                if ~newBrk.hasBothChildren()    
+                    error('Problema al insertar la primera pareja de nodos');
+                end
+                          
                 
             else
                 
                 %Nuevo nodo izquierdo y modificación de la información de
                 %upperNode
+                upperNode.sites = {existingSite newSite};
                 upperNodeLeft = Node({existingSite 0});
                 upperNodeLeft.parent = upperNode;
                 upperNode.leftChild = upperNodeLeft;
-                
-                upperNode.sites = {existingSite siteEvent};
-                upperNode.balanceFactor = -1;
-                 %Conexión con el nuevo borde que traza
+                %Conexión con el nuevo borde que traza
                 upperNode.edge = leftEdge;
                 
                 %Nuevo nodo de brkPoint
-                
-                newBrk = Node({siteEvent existingSite});
-                newLeft = Node({siteEvent 0 });
-                newRight = Node({existingSite 0});
+                newBrk = Node({newSite existingSite});
+                newBrk.parent = upperNode;
+                upperNode.rightChild = newBrk;
+                obj.updateBalance(upperNode);
                 %Conexión con el nuevo borde que traza
                 newBrk.edge = rightEdge;
-                
-                %Unión entre nodos nuevos
-                
+                %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
+                if ~upperNode.hasBothChildren()    
+                    error('Problema al insertar la primera pareja de nodos');
+                end
+                %Nodos arcos restantes
+                %Arco izquierdo
+                newLeft = Node({newSite 0 });
                 newLeft.parent = newBrk;
-                newRight.parent = newBrk;
-                newBrk.parent = upperNode;
-                
                 newBrk.leftChild = newLeft;
+                %Arco derecho
+                newRight = Node({existingSite 0});
+                newRight.parent = newBrk;    
                 newBrk.rightChild = newRight;
-                upperNode.rightChild = newBrk;
+                obj.updateBalance(newBrk);              
                 %Devolver el nodo que representa al arco nuevo.
                 nodeNewArc = newLeft;
-                %Update balance
-                obj.updateBalanceBulk(upperNode)
-
+                %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
+                if ~newBrk.hasBothChildren()    
+                    error('Problema al insertar la primera pareja de nodos');
+                end
                 
             end
             obj.size = obj.size + 4;
-            
+            %}
             
         end
     %Función auxiliar para el método de inserción
@@ -121,7 +146,7 @@ classdef AVL < handle
             key = node.key(linePos);
             if key < currentNode.key(linePos)
                 if ~isempty(currentNode.leftChild)
-                    obj.put_(node, currentNode.leftChild);
+                    obj.put_(node, currentNode.leftChild, linePos);
                 else
                     currentNode.leftChild = node;
                     node.parent = currentNode;
@@ -130,7 +155,7 @@ classdef AVL < handle
                 
             else
                 if ~isempty(currentNode.rightChild)
-                    obj.put_(node, currentNode.rightChild);
+                    obj.put_(node, currentNode.rightChild,linePos);
                 else
                     currentNode.rightChild = node;
                     node.parent = currentNode;
@@ -283,7 +308,70 @@ classdef AVL < handle
                 error('No existe nodo en el árbol');
             end
         end
-    
+        %Función que elimina el arco asociado al evento de círculo y el
+        %brkPoint. Retorna el nodo remanente
+        function remainingNode =  deleteArc(obj, node)
+            if obj.size > 1
+                remainingNode = obj.removeArc(node);
+                obj.size = obj.size - 2;
+            elseif obj.size == 1 && isequal(obj.root,node)
+                obj.root = [];
+                obj.size = obj.size - 1;
+            else
+                error('No existe nodo en el árbol');
+            end
+        end
+        function remainingNode = removeArc(obj,node)
+            %{
+            Elimina el arco
+            
+            if node.isLeftChild()
+                    node.parent.leftChild = [];
+                    remainingNode = node.parent.rightChild;
+            else
+                    node.parent.rightChild = [];
+                    remainingNode = node.parent.leftChild;
+            end
+            %}
+            %Elimina el brkPoint
+            brk = node.parent;
+            if node.isRightChild()
+                   if brk.isLeftChild()
+                       brk.leftChild.parent = brk.parent;
+                       brk.parent.leftChild = brk.leftChild;
+                   elseif brk.isRightChild()
+                       brk.leftChild.parent = brk.parent;
+                       brk.parent.rightChild = brk.leftChild;
+                   else
+                       %Caso en el que el nodo a eliminar es la raiz
+                       brk.replaceData(brk.leftChild.sites, brk.leftChild.leftChild, brk.leftChild.rightChild); 
+                   end
+                   remainingNode = brk.leftChild;
+                   
+            else
+                    if brk.isLeftChild()
+                       brk.rightChild.parent = brk.parent;
+                       brk.parent.leftChild = brk.rightChild;
+                   elseif brk.isRightChild()
+                       brk.rightChild.parent = brk.parent;
+                       brk.parent.rightChild = brk.rightChild;
+                   
+                   else
+                       %Caso en el que el nodo a eliminar es la raiz
+                       brk.replaceData(brk.rightChild.sites, brk.rightChild.leftChild, brk.rightChild.rightChild); 
+                       
+                   end
+                   remainingNode = brk.rightChild;
+                    
+            end
+            obj.updateBalanceDel(remainingNode);%RemainingNode puede ser un nodo hoja o brkPoint  
+            %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
+            if ~remainingNode.parent.hasBothChildren()    
+                    error('Problema al eliminar el arco');
+            end
+        end
+        
+        %---------------------------------------------------------------------------------------------
         function remove(obj, node)
             if node.isLeaf()
             %Caso 1, el nodo a eliminar es una hoja

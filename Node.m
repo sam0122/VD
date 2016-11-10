@@ -44,8 +44,11 @@ classdef Node < handle
             else
                 p1 = obj.sites{1,1};
                 p2 = obj.sites{1,2};
-                
-                key = brkCoord(p1.xCoord,p1.yCoord,p2.xCoord,p2.yCoord ,linePos);
+                x1 = p1.xCoord;
+                y1 = p1.yCoord;
+                x2 = p2.xCoord;
+                y2 = p2.yCoord;
+                key = brkCoord(x1,y1,x2, y2,linePos);
             end
         
         end
@@ -178,29 +181,31 @@ classdef Node < handle
          
          %Método que busca al nodo que representa al brkPoint secundario
          %asociado al arco representado por el nodo hoja
-        function nodeParent = nodeSecParent(obj)
+        function nodeParent = nodeSecParent(obj, prevSite, nextSite)
              if isempty(obj.parent)
                  nodeParent = [];
              elseif  isempty(obj.parent.parent)
                  nodeParent = [];
              else
-                 nodeParent = obj.nodeSecParent_();
+                 nodeParent = obj.nodeSecParent_(prevSite, nextSite);
              end 
             
         end
         
-        function nodeParent = nodeSecParent_(obj)
+        function nodeParent = nodeSecParent_(obj, prevSite, nextSite)
             if obj.isLeftChild()
                 if obj.parent.isLeftChild()
-                    nodeParent = obj.parent.nodeSecParent_();
+                    nodeParent = obj.parent.nodeSecParent_(prevSite, nextSite);
                 else
                     nodeParent = obj.parent.parent;
+                    nodeParent.sites{1,2} = nextSite{1,1};
                 end
             else
                  if obj.parent.isRightChild()
-                    nodeParent = obj.parent.nodeSecParent_();
+                    nodeParent = obj.parent.nodeSecParent_(prevSite, nextSite);
                 else
                     nodeParent = obj.parent.parent;
+                    nodeParent.sites{1,1} = prevSite{1,1};
                  end
             end
                 
@@ -208,7 +213,7 @@ classdef Node < handle
         %Métodos para encontrar el nodo arco contiguo al nodo input
         function succ =  findNext(obj)
             if obj.isLeftChild()
-                succ = obj.parent.rightChild;
+                succ = obj.parent.rightChild.goLeft();
             else
                 currentNode = obj.parent;
                 succ = currentNode.findNext_();
@@ -235,7 +240,7 @@ classdef Node < handle
         %Métodos para encontrar el nodo anterior al nodo input
         function prev = findPrev(obj)
             if obj.isRightChild()
-                prev = obj.parent.leftChild;
+                prev = obj.parent.leftChild.goRight();
             else
                 currentNode = obj.parent;
                 prev = currentNode.findPrev_();

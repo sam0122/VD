@@ -79,20 +79,22 @@ classdef Voronoi < handle
         function handleCircleEvent(obj, circleEvent)
         %Eliminar nodo del árbol
             nodeEliminate = circleEvent.nodo;
-            parentEliminate = nodeEliminate.parent;
+            %parentEliminate = nodeEliminate.parent;
             %Guardar información importante relacionada al nodo que se va a
             %eliminar
-            secondParent = nodeEliminate.nodeSecParent();
+            
             nextNode = nodeEliminate.findNext();
             prevNode = nodeEliminate.findPrev();
+            secondParent = nodeEliminate.nodeSecParent(prevNode.sites, nextNode.sites);
             %Actualizar la información del segundo padre y se guarda la
-            %información de los bordes que estaban siendo trazados
+            %información de los bordes que estaban siendo trazados. Enviar
+            %a la función node.nodeSecParent()
             if nodeEliminate.isLeftChild()
-                secondParent.sites{1,2} = nextNode.sites{1,1};
+                %secondParent.sites{1,2} = nextNode.sites{1,1};
                 rightEdge = nodeEliminate.parent.edge;
                 leftEdge = secondParent.edge;
             else
-                secondParent.sites{1,1} = prevNode.sites{1,1};
+                %secondParent.sites{1,1} = prevNode.sites{1,1};
                 rightEdge = secondParent.edge;
                 leftEdge = nodeEliminate.parent.edge;
             end
@@ -105,12 +107,13 @@ classdef Voronoi < handle
             r = circleEvent.r;
             xV = circleEvent.xCoord;
             yV = circleEvent.yCoord + r;
-            %Crear el vértice y bordee.
+            %Crear el vértice y borde.
             newVertex = Vertex([],xV,yV);
             newEdge = Edge(newVertex,[]);
             newEdgeTwin = Edge([],[]);
             newEdge.twin = newEdgeTwin;
             newEdgeTwin.twin = newEdge;
+            newVertex.edge = newEdge;
             %Añadir a la estructura temporal
             obj.dcel.addVertex(newVertex);
             %Unir con caras existentes
@@ -132,8 +135,7 @@ classdef Voronoi < handle
             rightEdge.twin.vertex = newVertex;
             %------------------------------------
             %Eliminar los nodos del árbol            
-            obj.avl.delete(nodeEliminate);
-            obj.avl.delete(parentEliminate);
+            obj.avl.deleteArc(nodeEliminate);
             %------------------------------------
             %Revisar nuevas tripletas
             %Tripleta 1 prevNode, nextNode, nextNextNode
