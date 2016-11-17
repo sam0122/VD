@@ -1,4 +1,4 @@
-n = 70;
+n = 200;
 VD = Voronoi(n);
 
 %{
@@ -28,17 +28,30 @@ for i = 1:n
     VD.heap.insertEvent(e);
 end
 %}CONTADOR TEMPORAL
-counter = 0;
+counter1 = 0;
+counter2 = 0;
 %Ciclo algoritmo
 while VD.heap.currentSize > 0
     currentEvent = VD.heap.removeEvent();
     %Verifica si el evento es válido
     if ~currentEvent.type
         VD.handleSiteEvent(currentEvent); 
+        counter1 = counter1 + 1;
         
     elseif currentEvent.valido
         VD.handleCircleEvent(currentEvent);  
-        counter = counter + 1;
+        counter2 = counter2 + 1;
     end
     
 end
+%{
+ver = VD.dcel.vertex;
+m = size(ver);
+m = m(1,1);
+for i = 1:m
+    point = ver{i,1};
+    plot(point.x, point.y, '*g');
+    hold on
+end
+%}
+%voronoi(p(:,1),p(:,2));

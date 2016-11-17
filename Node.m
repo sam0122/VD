@@ -37,6 +37,11 @@ classdef Node < handle
         %coordenada del sitio. Si es un brk devuelve la posición de acuerdo
         %a la altura del sweep line usando la función brkCoord(). Esta
         %ultima función puede no estar optimizada.
+        function key = key2(obj)
+            site = obj.sites{1,1};
+            key = site.xCoord;
+        end
+        
         function key = key(obj, linePos)
             if obj.isLeaf()            
                 site =  obj.sites{1,1};
@@ -173,10 +178,18 @@ classdef Node < handle
              
          end
          %Función auxiliar del método de eliminar un nodo cuando este es la raiz y tiene solo un hijo. 
-         function replaceData(obj,sites,lc,rc)
-            obj.sites = sites;
-            obj.leftChild = lc;
-            obj.rightChild = rc;
+         function replaceData(obj,nodeReplace)
+            obj.sites = nodeReplace.sites;
+            obj.leftChild = nodeReplace.leftChild;
+            obj.rightChild = nodeReplace.rightChild;
+            obj.circleEvent = nodeReplace.circleEvent;
+            obj.edge = nodeReplace.edge;
+            obj.balanceFactor = nodeReplace.balanceFactor;
+            if ~isempty(obj.leftChild)
+                obj.leftChild.parent = obj;
+            elseif ~isempty(obj.rightChild)
+                obj.rightChild.parent = obj;
+            end
          end
          
          %Método que busca al nodo que representa al brkPoint secundario
@@ -262,6 +275,18 @@ classdef Node < handle
                 rightNode = obj.rightChild.goRight();
             end
             
+        end
+        %Función auxiliar que revisa si el nodo tienen 1 hijo
+        function val = hasOneChild(obj)
+            if obj.isLeaf()
+                val = 0;
+            elseif isempty(obj.leftChild) && ~isempty(obj.rightChild)
+                val = 1;
+            elseif ~isempty(obj.leftChild) && isempty(obj.rightChild)
+                val = 1;
+            else
+                val = 0;
+            end
         end
         
         

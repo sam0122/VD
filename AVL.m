@@ -27,9 +27,9 @@ classdef AVL < handle
     %especiales para voronoi
  
         %Función para insertar un nodo a la vez
-        function put(obj, node, linePos)
+        function put(obj, node)
             if ~isempty(obj.root)%Si no está vacío llama la función auxiliar put_()
-                obj.put_(node, obj.root, linePos);
+                obj.put_(node, obj.root);
             else %Si está vacío el nodo se convierte en la raíz
                 obj.root = node;
             end
@@ -75,7 +75,7 @@ classdef AVL < handle
                 %Conexión con el nuevo borde que traza
                 newBrk.edge = leftEdge;
                 %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
-                if ~upperNode.hasBothChildren()    
+                if ~upperNode.hasBothChildren() || newBrk.hasOneChild()    
                     error('Problema al insertar la primera pareja de nodos');
                 end
                 
@@ -92,7 +92,7 @@ classdef AVL < handle
                 %Devolver el nodo que representa al arco nuevo.
                 nodeNewArc = newRight;
                 %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
-                if ~newBrk.hasBothChildren()    
+                if ~newBrk.hasBothChildren() || newBrk.hasOneChild()    
                     error('Problema al insertar la primera pareja de nodos');
                 end
                           
@@ -105,6 +105,7 @@ classdef AVL < handle
                 upperNodeLeft = Node({existingSite 0});
                 upperNodeLeft.parent = upperNode;
                 upperNode.leftChild = upperNodeLeft;
+                
                 %Conexión con el nuevo borde que traza
                 upperNode.edge = leftEdge;
                 
@@ -116,7 +117,7 @@ classdef AVL < handle
                 %Conexión con el nuevo borde que traza
                 newBrk.edge = rightEdge;
                 %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
-                if ~upperNode.hasBothChildren()    
+                if ~upperNode.hasBothChildren() || newBrk.hasOneChild()    
                     error('Problema al insertar la primera pareja de nodos');
                 end
                 %Nodos arcos restantes
@@ -124,6 +125,7 @@ classdef AVL < handle
                 newLeft = Node({newSite 0 });
                 newLeft.parent = newBrk;
                 newBrk.leftChild = newLeft;
+                
                 %Arco derecho
                 newRight = Node({existingSite 0});
                 newRight.parent = newBrk;    
@@ -132,21 +134,30 @@ classdef AVL < handle
                 %Devolver el nodo que representa al arco nuevo.
                 nodeNewArc = newLeft;
                 %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
-                if ~newBrk.hasBothChildren()    
+                if ~newBrk.hasBothChildren() || newBrk.hasOneChild()    
                     error('Problema al insertar la primera pareja de nodos');
                 end
                 
+            end
+            if upperNode.balanceFactor >= 2 || upperNode.balanceFactor <= -2
+                error('Error en la inseción');
+            elseif newBrk.balanceFactor >= 2 || newBrk.balanceFactor <= -2
+                error('Error en la inseción');
+            elseif newRight.balanceFactor >= 2 || newRight.balanceFactor <= -2
+                error('Error en la inseción');
+            elseif newLeft.balanceFactor >= 2 || newLeft.balanceFactor <= -2
+                error('Error en la inseción');
             end
             obj.size = obj.size + 4;
             %}
             
         end
     %Función auxiliar para el método de inserción
-        function put_(obj, node, currentNode, linePos)%El nodo tiene que haber sido creado. Se sabe de antemano el sitio o sitios que dan la información de la posición del nodo si el nodo es interno (brk) o externo (arco)
-            key = node.key(linePos);
-            if key < currentNode.key(linePos)
+        function put_(obj, node, currentNode)%El nodo tiene que haber sido creado. Se sabe de antemano el sitio o sitios que dan la información de la posición del nodo si el nodo es interno (brk) o externo (arco)
+            key = node.key2();
+            if key < currentNode.key2()
                 if ~isempty(currentNode.leftChild)
-                    obj.put_(node, currentNode.leftChild, linePos);
+                    obj.put_(node, currentNode.leftChild);
                 else
                     currentNode.leftChild = node;
                     node.parent = currentNode;
@@ -155,7 +166,7 @@ classdef AVL < handle
                 
             else
                 if ~isempty(currentNode.rightChild)
-                    obj.put_(node, currentNode.rightChild,linePos);
+                    obj.put_(node, currentNode.rightChild);
                 else
                     currentNode.rightChild = node;
                     node.parent = currentNode;
@@ -207,7 +218,7 @@ classdef AVL < handle
              end
             
         end
-        
+        %Función de rebalance para el caso de inserción
         function rebalance(obj,node)
            if node.balanceFactor < 0
              if node.rightChild.balanceFactor > 0
@@ -226,8 +237,28 @@ classdef AVL < handle
              end
            end
         end
-         
-        function rotateLeft(obj,rotRoot)
+        %Función de rebalance para el caso de eliminación
+        function newRoot = rebalanceDel(obj,node)
+           if node.balanceFactor < 0
+             if node.rightChild.balanceFactor > 0
+                obj.rotateRight(node.rightChild);
+                newRoot = obj.rotateLeft(node);
+             else
+                newRoot = obj.rotateLeft(node);
+             end
+                      
+         elseif node.balanceFactor > 0
+             if node.leftChild.balanceFactor < 0
+                obj.rotateLeft(node.leftChild);
+                newRoot = obj.rotateRight(node);
+             else
+                newRoot = obj.rotateRight(node);
+             end
+           end
+        end
+        %--------------------------------------------------------------
+        %FUNCIONES DE ROTACIÓN
+        function newRoot = rotateLeft(obj,rotRoot)
             newRoot = rotRoot.rightChild;
             rotRoot.rightChild = newRoot.leftChild;
             if ~isempty(newRoot.leftChild)
@@ -249,7 +280,7 @@ classdef AVL < handle
             newRoot.balanceFactor = newRoot.balanceFactor + 1 + max(rotRoot.balanceFactor, 0);
         end
 
-        function rotateRight(obj,rotRoot)
+        function newRoot = rotateRight(obj,rotRoot)
             newRoot = rotRoot.leftChild;
             rotRoot.leftChild = newRoot.rightChild;
             if ~isempty(newRoot.rightChild)
@@ -322,51 +353,78 @@ classdef AVL < handle
             end
         end
         function remainingNode = removeArc(obj,node)
-            %{
-            Elimina el arco
             
+            
+            %Elimina el arco
+            brk = node.parent;
             if node.isLeftChild()
-                    node.parent.leftChild = [];
-                    remainingNode = node.parent.rightChild;
+                    
+                    remainingNode = node.parent.rightChild();
+                    %node.parent.leftChild = [];
+                    %obj.updateBalanceDel(node);
+                    obj.remove(node);
+                    
             else
-                    node.parent.rightChild = [];
-                    remainingNode = node.parent.leftChild;
+                    
+                    remainingNode = node.parent.leftChild();
+                    %node.parent.rightChild = [];
+                    %obj.updateBalanceDel(node);
+                    obj.remove(node);                    
+            end
+            %}
+            %{
+            if node.isLeftChild()
+                remainingNode = node.parent.rightChild();
+            else
+                remainingNode = node.parent.leftChild();
             end
             %}
             %Elimina el brkPoint
-            brk = node.parent;
-            if node.isRightChild()
+            obj.remove(brk);
+            %{
+            if remainingNode.isLeftChild()
                    if brk.isLeftChild()
                        brk.leftChild.parent = brk.parent;
                        brk.parent.leftChild = brk.leftChild;
+                       obj.updateBalanceDel(remainingNode);
                    elseif brk.isRightChild()
                        brk.leftChild.parent = brk.parent;
                        brk.parent.rightChild = brk.leftChild;
+                       obj.updateBalanceDel(remainingNode);
                    else
                        %Caso en el que el nodo a eliminar es la raiz
                        brk.replaceData(brk.leftChild.sites, brk.leftChild.leftChild, brk.leftChild.rightChild); 
                    end
-                   remainingNode = brk.leftChild;
+                   
                    
             else
                     if brk.isLeftChild()
                        brk.rightChild.parent = brk.parent;
                        brk.parent.leftChild = brk.rightChild;
+                       obj.updateBalanceDel(remainingNode);
                    elseif brk.isRightChild()
                        brk.rightChild.parent = brk.parent;
                        brk.parent.rightChild = brk.rightChild;
+                       obj.updateBalanceDel(remainingNode);
                    
                    else
                        %Caso en el que el nodo a eliminar es la raiz
                        brk.replaceData(brk.rightChild.sites, brk.rightChild.leftChild, brk.rightChild.rightChild); 
                        
                    end
-                   remainingNode = brk.rightChild;
+                   
                     
             end
-            obj.updateBalanceDel(remainingNode);%RemainingNode puede ser un nodo hoja o brkPoint  
+            %}
+            %RemainingNode puede ser un nodo hoja o brkPoint  
             %COMPROBACIÓN ERRORES. ELIMINAR CUANDO SE ENCUENTRE EL BUG
-            if ~remainingNode.parent.hasBothChildren()    
+            if remainingNode.balanceFactor >= 2 || remainingNode.balanceFactor <= -2
+                error('Error en la eliminación');
+            elseif remainingNode.parent.balanceFactor >= 2 || remainingNode.parent.balanceFactor <= -2
+                error('Error en la eliminación');
+            end
+            
+            if ~remainingNode.parent.hasBothChildren() || remainingNode.hasOneChild()    
                     error('Problema al eliminar el arco');
             end
         end
@@ -406,7 +464,7 @@ classdef AVL < handle
                    else
                        %Caso en el que el nodo a eliminar es la raiz
                        obj.updateBalanceDel(node.leftChild);
-                       node.replaceData(node.leftChild.sites, node.leftChild.leftChild, node.leftChild.rightChild); 
+                       node.replaceData(node.leftChild); 
                    end
                 else
                     if node.isLeftChild()
@@ -421,7 +479,7 @@ classdef AVL < handle
                     else
                        %Caso en el que el nodo a eliminar es la raiz
                        obj.updateBalanceDel(node.rightChild);
-                       node.replaceData(node.rightChild.sites, node.rightChild.leftChild, node.rightChild.rightChild); 
+                       node.replaceData(node.rightChild); 
                        
                    end
                     
@@ -434,6 +492,31 @@ classdef AVL < handle
         
         function updateBalanceDel(obj, node)
             
+            if node.balanceFactor > 1 || node.balanceFactor < -1
+                newRoot = obj.rebalanceDel(node);
+                if newRoot.balanceFactor == 0
+                    obj.updateBalanceDel(newRoot)
+                    return;
+                else
+                    return
+                end 
+                
+            end
+            
+            if ~isempty(node.parent)
+                if node.isLeftChild()
+                    node.parent.balanceFactor = node.parent.balanceFactor - 1;
+                elseif node.isRightChild()
+                     node.parent.balanceFactor = node.parent.balanceFactor + 1;
+                end
+                
+                if node.parent.balanceFactor == 1 || node.parent.balanceFactor == -1 
+                    return
+                else
+                    obj.updateBalanceDel(node.parent);
+                end
+             end
+            %{
             if node.balanceFactor > 1 || node.balanceFactor < -1
                 obj.rebalance(node);
                 return
@@ -457,7 +540,7 @@ classdef AVL < handle
                 end
                             
             end
-            
+            %}
         end
         %Métodos para obtener un nodo dada la información de los sitios
         function res = get(obj,sites)
