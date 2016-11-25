@@ -39,4 +39,5 @@ ymin= 0;
 xmax= 20;
 ymax = 15;
 %----------------------------------------------------------
-pol = f1.processFace(xmin, ymin, xmax, ymax)
+pol = f1.processFace(xmin, ymin, xmax, ymax);
+fill(pol(:,1),pol(:,2),'r')

@@ -45,6 +45,7 @@ classdef Face < handle
                         currentEdge = currentEdge.next;
                         %Si llega al inicial
                         if currentEdge == initialEdge
+                            pol(i,:) = [pol(1,1), pol(1,2)];
                             traversed = 1;
                         end
                     %Si encuentra que el borde siguiente está vacío

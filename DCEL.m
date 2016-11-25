@@ -81,7 +81,22 @@ classdef DCEL < handle
            obj.vertex{obj.vsize,1} = vertex;
            
         end
-        %}
+        %Función que procesa todas las caras incluidas en la DCEL. Incluye
+        %la gráfica
+        function processFaces(obj, xmin, ymin, xmax, ymax)
+            r = 134/255;
+            b = 122/255;
+            g = b;
+            color = [r b g];
+            for i = 1:obj.size
+                currentFace = obj.faces{i,1};
+                pol = currentFace.processFace(xmin,ymin,xmax,ymax);
+                fill(pol(:,1),pol(:,2),color);
+                hold on
+            end
+            
+        end
+        
         
         
     end

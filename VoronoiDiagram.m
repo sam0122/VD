@@ -1,4 +1,4 @@
-n = 200;
+n = 10000;
 VD = Voronoi(n);
 
 %{
@@ -20,9 +20,11 @@ VD.heap.insertEvent(site6);
 
 %Crear los puntos
 p = zeros(n,2);
-rng(0.5,'twister');
-p(:,1) = rand(n,1);
-p(:,2) = rand(n,1);
+%rng(0.5,'twister');
+p(:,1) = 0.98*rand(n,1);
+p(:,2) = 0.98*rand(n,1);
+%voronoi(p(:,1),p(:,2));
+%found = 0;
 for i = 1:n
     e = Evento(p(i,1),p(i,2));
     VD.heap.insertEvent(e);
@@ -30,20 +32,27 @@ end
 %}CONTADOR TEMPORAL
 counter1 = 0;
 counter2 = 0;
+xmin = 0;
+xmax = 1;
+ymin = 0;
+ymax = 1;
+
 %Ciclo algoritmo
 while VD.heap.currentSize > 0
     currentEvent = VD.heap.removeEvent();
     %Verifica si el evento es válido
-    if ~currentEvent.type
+    if ~currentEvent.type      
         VD.handleSiteEvent(currentEvent); 
-        counter1 = counter1 + 1;
-        
+        counter1 = counter1 + 1;        
     elseif currentEvent.valido
-        VD.handleCircleEvent(currentEvent);  
+        VD.handleCircleEvent(currentEvent, xmin, ymin, xmax, ymax);  
         counter2 = counter2 + 1;
     end
     
 end
+%Procesar los polígonos y graficarlos
+VD.dcel.processFaces(xmin, ymin, xmax, ymax);
+axis equal
 %{
 ver = VD.dcel.vertex;
 m = size(ver);

@@ -43,6 +43,7 @@ classdef Voronoi < handle
                  %empiezan a trazar
                  %----------Nueva cara
                  newFace = Face([],siteEvent);
+                 siteEvent.face = newFace;
                  %----------Añadir cara nueva al array
                  obj.dcel.addFace(newFace);
                  %---------Crear los bordes
@@ -76,13 +77,16 @@ classdef Voronoi < handle
             
         end
         
-        function handleCircleEvent(obj, circleEvent)
+        function handleCircleEvent(obj, circleEvent, xmin, ymin, xmax, ymax)
         %Eliminar nodo del árbol
             nodeEliminate = circleEvent.nodo;
             %parentEliminate = nodeEliminate.parent;
             %Guardar información importante relacionada al nodo que se va a
             %eliminar
-            
+            %EXPERIMENTAL
+            siteEliminate = nodeEliminate.sites{1,1};
+            faceEliminate = siteEliminate.face;
+            %----------------------------------------------------------------
             nextNode = nodeEliminate.findNext();
             prevNode = nodeEliminate.findPrev();
             secondParent = nodeEliminate.nodeSecParent(prevNode.sites, nextNode.sites);
@@ -93,10 +97,14 @@ classdef Voronoi < handle
                 %secondParent.sites{1,2} = nextNode.sites{1,1};
                 rightEdge = nodeEliminate.parent.edge;
                 leftEdge = secondParent.edge;
+                %rightNode = nodeEliminate.parent;
+                %leftNode = secondParent;
             else
                 %secondParent.sites{1,1} = prevNode.sites{1,1};
                 rightEdge = secondParent.edge;
                 leftEdge = nodeEliminate.parent.edge;
+                %rightNode = secondParent;
+                %leftNode = nodeEliminate.parent;
             end
             %Eliminar eventos de círculo asociados
             nextCircleEvent = nextNode.circleEvent;
@@ -107,32 +115,124 @@ classdef Voronoi < handle
             r = circleEvent.r;
             xV = circleEvent.xCoord;
             yV = circleEvent.yCoord + r;
-            %Crear el vértice y borde.
-            newVertex = Vertex([],xV,yV);
-            newEdge = Edge(newVertex,[]);
-            newEdgeTwin = Edge([],[]);
-            newEdge.twin = newEdgeTwin;
-            newEdgeTwin.twin = newEdge;
-            newVertex.edge = newEdge;
-            %Añadir a la estructura temporal
-            obj.dcel.addVertex(newVertex);
-            %Unir con caras existentes
-            leftSite = prevNode.sites{1,1};
-            rightSite = nextNode.sites{1,1};
-            leftFace = leftSite.face;
-            rightFace = rightSite.face;
-            newEdge.face = rightFace;
-            newEdgeTwin.face = leftFace;
-            %Unir con bordes que estaban siendo trazados
-            leftEdge.next = rightEdge.twin;
-            rightEdge.twin.prev = leftEdge;
-            leftEdge.twin.vertex = newVertex;
-            newEdgeTwin.next = leftEdge.twin;
-            leftEdge.twin.prev = newEdgeTwin;
-            %------------------------------------
-            rightEdge.next = newEdge;
-            newEdge.prev = rightEdge;
-            rightEdge.twin.vertex = newVertex;
+            %Revisión de la ubicación del vértice
+            if xV < xmin || xV > xmax || yV < ymin || yV > ymax
+                %Vértice vacío y desconexión con bordes anteriores
+                %newVertex = Vertex([],[],[]);
+                newEdge = Edge([],[]);
+                newEdgeTwin = Edge([],[]);
+                newEdge.twin = newEdgeTwin;
+                newEdgeTwin.twin = newEdge;
+                %newVertex.edge = newEdge;
+                %------------------Conectar con cara
+                leftSite = prevNode.sites{1,1};
+                rightSite = nextNode.sites{1,1};
+                leftFace = leftSite.face;
+                rightFace = rightSite.face;
+                newEdge.face = rightFace;
+                newEdgeTwin.face = leftFace;
+                
+            else
+                %Crear el vértice y borde.
+                newVertex = Vertex([],xV,yV);
+                newEdge = Edge(newVertex,[]);
+                newEdgeTwin = Edge([],[]);
+                newEdge.twin = newEdgeTwin;
+                newEdgeTwin.twin = newEdge;
+                newVertex.edge = newEdge;
+                %Añadir a la estructura temporal
+                obj.dcel.addVertex(newVertex);
+                %Unir con caras existentes
+                leftSite = prevNode.sites{1,1};
+                rightSite = nextNode.sites{1,1};
+                leftFace = leftSite.face;
+                rightFace = rightSite.face;
+                %EXPERIMENTAL
+                rightFace.edge = newEdge;
+                leftFace.edge = newEdgeTwin;                
+                faceEliminate.edge = leftEdge;
+                %---------------------------------
+                newEdge.face = rightFace;
+                newEdgeTwin.face = leftFace;
+                
+                %Unir con bordes que estaban siendo trazados
+                %MODIFICAR
+                %leftSite = leftEdge.face.site;
+                %rightSite = rightEdge.face.site;
+                siteEliminate = nodeEliminate.sites{1,1};
+
+                if isequal(leftSite, leftEdge.face.site)
+                    if isequal(siteEliminate,rightEdge.face.site)%Caso 4
+
+                        leftEdge.twin.next = rightEdge;
+                        rightEdge.prev = leftEdge.twin;
+
+                        rightEdge.twin.next = newEdge;
+                        newEdge.prev = rightEdge.twin;
+
+                        newEdgeTwin.next = leftEdge;
+                        leftEdge.prev = newEdgeTwin;
+                        %----------------------------------
+                        rightEdge.vertex = newVertex;
+                        leftEdge.vertex = newVertex;
+
+                    elseif isequal(rightSite,rightEdge.face.site) %Caso 3
+
+                        leftEdge.prev = newEdgeTwin;
+                        newEdgeTwin.next = leftEdge;
+
+                        leftEdge.twin.next = rightEdge.twin;
+                        rightEdge.twin.prev = leftEdge.twin;
+
+                        rightEdge.next = newEdge;
+                        newEdge.prev = rightEdge;
+                        %----------------------------------
+                        rightEdge.twin.vertex = newVertex;
+                        leftEdge.vertex = newVertex;
+                    else
+                        error('Nodo y borde no están asociados');
+
+                    end
+
+                elseif isequal(siteEliminate, leftEdge.face.site)
+
+                    if isequal(siteEliminate,rightEdge.face.site) %Caso1
+
+                        leftEdge.next = rightEdge;
+                        rightEdge.prev = leftEdge;
+
+                        newEdgeTwin.next = leftEdge.twin;
+                        leftEdge.twin.prev = newEdgeTwin;
+
+                        rightEdge.twin.next = newEdge;
+                        newEdge.prev = rightEdge.twin;
+                        %----------------------------------
+                        leftEdge.twin.vertex = newVertex;
+                        rightEdge.vertex = newVertex;
+
+                    elseif isequal(rightSite,rightEdge.face.site) %Caso 2
+
+                        leftEdge.next = rightEdge.twin;
+                        rightEdge.twin.prev = leftEdge;
+
+                        leftEdge.twin.prev = newEdgeTwin;
+                        newEdgeTwin.next = leftEdge.twin;
+
+                        rightEdge.next = newEdge;
+                        newEdge.prev = rightEdge;                    
+                        %------------------------------------
+                        rightEdge.twin.vertex = newVertex;
+                        leftEdge.twin.vertex = newVertex;
+                    else
+                        error('Nodo y borde no están asociados');
+                    end
+                else
+
+                        error('Nodo y borde no están asociados');
+                end
+               
+            end
+             secondParent.edge = newEdge;
             %------------------------------------
             %Eliminar los nodos del árbol            
             obj.avl.deleteArc(nodeEliminate);
@@ -144,6 +244,8 @@ classdef Voronoi < handle
             %Tripleta 2 prevPrevNode, prevNode,nextNode
             prevPrevNode = prevNode.findPrev();
             obj.checkCircleEvent(prevPrevNode, prevNode,nextNode);
+            
+           
             
             
         end
