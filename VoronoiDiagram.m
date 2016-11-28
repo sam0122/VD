@@ -1,41 +1,61 @@
-n = 10000;
+%Cargar los puntos de los archivos Vacios.txt y Agregados.txt
+nAgg = 100;%Número de agregados 
+nV = 40;%Número de vacíos
+vecAgg = [];
+vecVacios = [];
+fileAgg = fopen('Agregados.txt');
+%Ciclo que recorre cada una de las filas del archivo de texto
+for i=1:nAgg*2
+    temp = textscan(fileAgg, '%f %f %f %f %f %f %f %f %f %f %f',1);
+    vecAgg(i,:) = cell2mat(temp);
+end
+fileVacios = fopen('Vacíos.txt');
+for i=1:nV*2
+    temp = textscan(fileVacios, '%f %f %f %f %f %f %f',1);
+    vecVacios(i,:) = cell2mat(temp);
+end
+n = nAgg + nV;
 VD = Voronoi(n);
-
-%{
-Sitios
-site1 = Evento(0.5, 0.5);
-site2 = Evento(1,1);
-site3 = Evento(0.5,2);
-site4 = Evento(1.5,1.5);
-site5 = Evento(1.6,0.2);
-site6 = Evento(2, 1.8);
-%Inicializar cola prioritaria
-VD.heap.insertEvent(site1);
-VD.heap.insertEvent(site2);
-VD.heap.insertEvent(site3);
-VD.heap.insertEvent(site4);
-VD.heap.insertEvent(site5);
-VD.heap.insertEvent(site6);
-%}
-
-%Crear los puntos
-p = zeros(n,2);
+%----------------------------------------------------------------------------------------------------
+%Crear los sitios a partir de la información importada
+%p = zeros(n,2);
 %rng(0.5,'twister');
-p(:,1) = 0.98*rand(n,1);
-p(:,2) = 0.98*rand(n,1);
+%p(:,1) = 0.98*rand(n,1);
+%p(:,2) = 0.98*rand(n,1);
 %voronoi(p(:,1),p(:,2));
 %found = 0;
-for i = 1:n
-    e = Evento(p(i,1),p(i,2));
-    VD.heap.insertEvent(e);
+temp = size(vecAgg);
+col = (temp(1,2)-3);
+%acum = 1;
+%p = [];
+for i = 1:2:nAgg*2
+    for j=1:col
+        %p(acum,1) = vecAgg(i,j);
+        %p(acum,2) =  vecAgg(i+1,j);
+        %acum = acum + 1;
+        e = Evento(vecAgg(i,j),vecAgg(i+1,j));
+        VD.heap.insertEvent(e);
+    end
 end
+temp = size(vecVacios);
+col = (temp(1,2)-3);
+for i = 1:2:nV*2
+    for j=1:col
+        %p(acum,1) = vecVacios(i,j);
+        %p(acum,2) =  vecVacios(i+1,j);
+        %acum = acum + 1;
+        e = Evento(vecVacios(i,j),vecVacios(i+1,j));
+        VD.heap.insertEvent(e);
+    end
+end
+%voronoi(p(:,1),p(:,2));
 %}CONTADOR TEMPORAL
 counter1 = 0;
 counter2 = 0;
 xmin = 0;
-xmax = 1;
+xmax = 50;
 ymin = 0;
-ymax = 1;
+ymax = 50;
 
 %Ciclo algoritmo
 while VD.heap.currentSize > 0

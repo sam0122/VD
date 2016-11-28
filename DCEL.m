@@ -91,8 +91,10 @@ classdef DCEL < handle
             for i = 1:obj.size
                 currentFace = obj.faces{i,1};
                 pol = currentFace.processFace(xmin,ymin,xmax,ymax);
-                fill(pol(:,1),pol(:,2),color);
-                hold on
+                if ~isempty(pol)
+                    fill(pol(:,1),pol(:,2),color);
+                    hold on
+                end
             end
             
         end
