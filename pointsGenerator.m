@@ -6,7 +6,7 @@ El = 0.8; %Variable de elongación de las partículas.
 vD = [12.5;9.5;4.75;2.36;1.18;0.6;0.3];
 vT = vD.^2*pi()*0.25;
 vA = [0.047255;0.061587;0.565567;0.280371;0.042375;0.002792;0.000052];
-aT = 50*50;
+aT = 30*30;
 voids = 0.2;
 G = generateGran(vD, vA, vT, aT, voids);
 %Número de puntos por esqueleto de agregado
@@ -14,13 +14,13 @@ nP = 9;
 %Número de puntos por esqueleto de vacío
 nPV = 5;
 %TEST MODIFICACIÓN DEL NÚMERO DE POLÍGONOS DE G
-G(:,4) = [1;1;21;43;26;7;1];
+%G(:,4) = [1;1;21;43;26;7;1];
 %G(:,4) = [2;	5;	169;	340;	206;	53;	4];
 %G(:,4) = [1;	1;	4;	7;	5;	2;	1];
-%G(:,4) = [1;	1;	2;	4;	2;	1;	1];
+G(:,4) = [1;	1;	2;	4;	2;	1;	1];
 nAg = sum(G);
 nAg = nAg(1,4);
-nV = 40; %Número de polígonos que representan vacíos
+nV = 4; %Número de polígonos que representan vacíos
 tamVacios = 3; %Tamaño promedio vacíos
 %Rutina para la generación inicial de los polígonos centrados en el origen.
 %Las 3 últimas columan guardan el tamaño de tamiz y las coordenadas del
@@ -57,8 +57,8 @@ end
 %Definición del tamaño de la caja
 xmin = 0;
 ymin = 0;
-xmax = 50;
-ymax = 50;
+xmax = 30;
+ymax = 30;
 %----------------------------------------------------------------------------------
 %Definición de los bordes de los polígonos. Último término es el primero
 %repetido--> tener polígono cerrado

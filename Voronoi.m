@@ -9,15 +9,18 @@ classdef Voronoi < handle
         dcel;
         %Lista prioritaria con los eventos
         heap;
+        %Arreglo con los polígonos que representan los agregados
+        polygons;
         
     end
     
     methods
         %Constructor, n es el número de sitios de Voronoi
-        function obj = Voronoi(n)
+        function obj = Voronoi(n, nAgg)
             obj.avl = AVL();
             obj.dcel = DCEL();
             obj.heap = binHeap(n);
+            obj.polygons = Polygons(nAgg);
         end
         
         %Método para insertar un arco en la línea playa, manejo de eventos

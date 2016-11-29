@@ -1,21 +1,23 @@
 %Cargar los puntos de los archivos Vacios.txt y Agregados.txt
-nAgg = 100;%Número de agregados 
-nV = 40;%Número de vacíos
+nAgg = 12;%Número de agregados 
+nV = 4;%Número de vacíos
 vecAgg = [];
 vecVacios = [];
 fileAgg = fopen('Agregados.txt');
 %Ciclo que recorre cada una de las filas del archivo de texto
 for i=1:nAgg*2
     temp = textscan(fileAgg, '%f %f %f %f %f %f %f %f %f %f %f',1);
-    vecAgg(i,:) = cell2mat(temp);
+    vecAgg(i,1) = cell2mat(temp(1,11));
+    vecAgg(i,2:11) = cell2mat(temp(1,1:10));
 end
 fileVacios = fopen('Vacíos.txt');
 for i=1:nV*2
     temp = textscan(fileVacios, '%f %f %f %f %f %f %f',1);
-    vecVacios(i,:) = cell2mat(temp);
+    vecVacios(i,1) = cell2mat(temp(1,7));
+    vecVacios(i,2:7) = cell2mat(temp(1,1:6));
 end
 n = nAgg + nV;
-VD = Voronoi(n);
+VD = Voronoi(n, nAgg);
 %----------------------------------------------------------------------------------------------------
 %Crear los sitios a partir de la información importada
 %p = zeros(n,2);
@@ -25,20 +27,25 @@ VD = Voronoi(n);
 %voronoi(p(:,1),p(:,2));
 %found = 0;
 temp = size(vecAgg);
-col = (temp(1,2)-3);
+col = (temp(1,2)-2);
 %acum = 1;
 %p = [];
+
 for i = 1:2:nAgg*2
+    agregado = Agregates(col);
+    VD.polygons.addAgregate(agregado);
     for j=1:col
         %p(acum,1) = vecAgg(i,j);
         %p(acum,2) =  vecAgg(i+1,j);
         %acum = acum + 1;
+        %Asocia el sitio al polígono de agg. El primero es el centro        
         e = Evento(vecAgg(i,j),vecAgg(i+1,j));
+        agregado.addSite(e);
         VD.heap.insertEvent(e);
     end
 end
 temp = size(vecVacios);
-col = (temp(1,2)-3);
+col = (temp(1,2)-2);
 for i = 1:2:nV*2
     for j=1:col
         %p(acum,1) = vecVacios(i,j);
@@ -53,9 +60,9 @@ end
 counter1 = 0;
 counter2 = 0;
 xmin = 0;
-xmax = 50;
+xmax = 30;
 ymin = 0;
-ymax = 50;
+ymax = 30;
 
 %Ciclo algoritmo
 while VD.heap.currentSize > 0
@@ -71,7 +78,7 @@ while VD.heap.currentSize > 0
     
 end
 %Procesar los polígonos y graficarlos
-VD.dcel.processFaces(xmin, ymin, xmax, ymax);
+VD.polygons.processFaces(xmin, ymin, xmax, ymax);
 axis equal
 %{
 ver = VD.dcel.vertex;
