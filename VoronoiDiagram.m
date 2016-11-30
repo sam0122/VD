@@ -7,14 +7,17 @@ fileAgg = fopen('Agregados.txt');
 %Ciclo que recorre cada una de las filas del archivo de texto
 for i=1:nAgg*2
     temp = textscan(fileAgg, '%f %f %f %f %f %f %f %f %f %f %f',1);
-    vecAgg(i,1) = cell2mat(temp(1,11));
+    vecAgg(i,1) = cell2mat(temp(1,11));%Incluir el centro como punto de
+    %Voronoi
     vecAgg(i,2:11) = cell2mat(temp(1,1:10));
+    %vecAgg(i,1:11) = cell2mat(temp(1,1:11));
 end
 fileVacios = fopen('Vacíos.txt');
 for i=1:nV*2
     temp = textscan(fileVacios, '%f %f %f %f %f %f %f',1);
-    vecVacios(i,1) = cell2mat(temp(1,7));
-    vecVacios(i,2:7) = cell2mat(temp(1,1:6));
+    %vecVacios(i,1) = cell2mat(temp(1,7));
+    %vecVacios(i,2:7) = cell2mat(temp(1,1:6));
+    vecVacios(i,1:7) = cell2mat(temp(1,1:7));
 end
 n = nAgg + nV;
 VD = Voronoi(n, nAgg);
@@ -27,17 +30,17 @@ VD = Voronoi(n, nAgg);
 %voronoi(p(:,1),p(:,2));
 %found = 0;
 temp = size(vecAgg);
-col = (temp(1,2)-2);
-%acum = 1;
-%p = [];
+col = (temp(1,2)-2);%-2 si se incluye el centro, -3 si no.
+acum = 1;
+p = [];
 
 for i = 1:2:nAgg*2
     agregado = Agregates(col);
     VD.polygons.addAgregate(agregado);
     for j=1:col
-        %p(acum,1) = vecAgg(i,j);
-        %p(acum,2) =  vecAgg(i+1,j);
-        %acum = acum + 1;
+        p(acum,1) = vecAgg(i,j);
+        p(acum,2) =  vecAgg(i+1,j);
+        acum = acum + 1;
         %Asocia el sitio al polígono de agg. El primero es el centro        
         e = Evento(vecAgg(i,j),vecAgg(i+1,j));
         agregado.addSite(e);
@@ -45,17 +48,17 @@ for i = 1:2:nAgg*2
     end
 end
 temp = size(vecVacios);
-col = (temp(1,2)-2);
+col = (temp(1,2)-3);%-2 si se incluye el centro, -3 si no.
 for i = 1:2:nV*2
     for j=1:col
-        %p(acum,1) = vecVacios(i,j);
-        %p(acum,2) =  vecVacios(i+1,j);
-        %acum = acum + 1;
+        p(acum,1) = vecVacios(i,j);
+        p(acum,2) =  vecVacios(i+1,j);
+        acum = acum + 1;
         e = Evento(vecVacios(i,j),vecVacios(i+1,j));
         VD.heap.insertEvent(e);
     end
 end
-%voronoi(p(:,1),p(:,2));
+voronoi(p(:,1),p(:,2));
 %}CONTADOR TEMPORAL
 counter1 = 0;
 counter2 = 0;

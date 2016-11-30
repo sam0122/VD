@@ -1,9 +1,10 @@
-function coo = createPolygon(L1, El, t )
+function coo = createPolygon(L1, El, t, extraPoints )
 %Función que devuelve los puntos en un polígono en forma de rombo
 %   L es la longitud del eje mayor y El es el parámetro de elongoación
 %   entre 0 y 1
 L2 = L1 * El;
-if t
+if t && ~extraPoints
+    %{
     coo = zeros(2,9);
     %--------------------------------
     coo(1,1) = -L1*0.5;
@@ -26,7 +27,65 @@ if t
     coo(2,8) = -L2*0.25;
     coo(2,9) = 0;
     %---------------------------------
+    %} 
+    %UBICACIÓN DE PUNTOS CIRCULAR
+    coo = zeros(2,9);
+    %-----------------------------------
+    coo(1,1) = -L1*0.5;
+    coo(1,2) = -L1*0.5*0.7071;
+    coo(1,3) = 0;
+    coo(1,4) = L1*0.5*0.7071;
+    coo(1,5) = L1*0.5;
+    coo(1,6) = L1*0.5*0.7071;
+    coo(1,7) = 0;
+    coo(1,8) = -L1*0.5*0.7071;
+    coo(1,9) = -L1*0.5;
+    %-------------------------------------
+    coo(2,1) = 0;
+    coo(2,2) = L2*0.5*0.7071;
+    coo(2,3) = L2*0.5;
+    coo(2,4) = L2*0.5*0.7071;
+    coo(2,5) = 0;
+    coo(2,6) = -L2*0.5*0.7071;
+    coo(2,7) = -L2*0.5;
+    coo(2,8) = -L2*0.5*0.7071;
+    coo(2,9) = 0;
+elseif t && extraPoints
+    %Crea polígonos con 12 puntos
+    %UBICACIÓN DE PUNTOS CIRCULAR
+    coo = zeros(2,13);
+    %-----------------------------------
+    coo(1,1) = -L1*0.5;
+    coo(1,2) = -L1*0.5*0.8660;
+    coo(1,3) = -L1*0.25;
+    coo(1,4) =  0;
+    coo(1,5) = L1*0.25;
+    coo(1,6) = L1*0.5*0.8660;
+    coo(1,7) = L1*0.5;
+    coo(1,8) = L1*0.5*0.8660;
+    coo(1,9) = L1*0.25;
+    coo(1,10) = 0;
+    coo(1,11) = -L1*0.25;
+    coo(1,12) = -L1*0.5*0.8660;
+    coo(1,13) = -L1*0.5;
+    %-------------------------------------
+    coo(2,1) = 0;
+    coo(2,2) = L2*0.25;
+    coo(2,3) = L2*0.5*0.8660;
+    coo(2,4) = L2*0.5;
+    coo(2,5) = L2*0.5*0.8660;
+    coo(2,6) = L2*0.25;
+    coo(2,7) = 0;
+    coo(2,8) = -L2*0.25;
+    coo(2,9) = -L2*0.5*0.8660;
+    coo(2,10) = -L2*0.5;
+    coo(2,11) = -L2*0.5*0.8660;
+    coo(2,12) = -L2*0.25;
+    coo(2,13) = 0;
+    
+    
 else
+    
     coo = zeros(2,5);
     %---------------------------------
     coo(1,1) = -L1*0.5;
