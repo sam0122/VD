@@ -1,7 +1,7 @@
 function aA =  areasPI()
 %Calcula áreas de acuerdo a un análisis de imágen
 
-img = imread('SAMP770_0.99_Recortada.PNG');
+img = imread('SAMP770_0.99_15K.PNG');
 gray = rgb2gray(img);
 %imshow(gray);
 bw_img = im2bw(gray);

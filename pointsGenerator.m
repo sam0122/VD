@@ -764,7 +764,7 @@ pol(sI+sII+sIII-2:sI+sII+sIII+sIV-4,1:col) = polIV;
 pol = pol';
 fprintf(agg, format,pol); 
 voids = fopen('Vacíos.txt','w');
-format = '%10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f \n';
+format = '%10.6f %10.6f %10.6f %10.6f %10.6f %10.6f \n';
 polVacios = [polVaciosI;polVaciosII;polVaciosIII;polVaciosIV];
 polVacios = polVacios';
 fprintf(voids, format,polVacios); 

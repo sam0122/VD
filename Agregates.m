@@ -24,7 +24,11 @@ classdef Agregates < handle
         %caras que componen el agregado
         function polF = processFace(obj,xmin, ymin, xmax, ymax)
             polF = [];
-            for i = 1: obj.sz
+            %Guardar los vértices del puntos central
+            centralSite = obj.sites{1,1};
+            centralFace = centralSite.face;
+            centralVertices = centralFace.processFace(xmin, ymin ,xmax, ymax);
+            for i = 2: obj.sz
                 currentSite = obj.sites{i,1};
                 currentFace = currentSite.face;
                 pol = currentFace.processFace(xmin, ymin, xmax, ymax);
@@ -32,6 +36,14 @@ classdef Agregates < handle
                     polF = [polF;pol];
                 end
             end
+            %Eliminar vertices centrales del arreglo de final de vértices
+            polF = setxor(polF, centralVertices, 'rows');
+            %Ordena los elementos en CCW
+            %Coordenadas del baricentro /podría ser el centroide o las
+            %coordenadas del centro del esqueleto
+            Cx = mean(polF(:,1));
+            Cy = mean(polF(:,1));
+            polF = mergeSort(polF, [Cx Cy]);
         end
     end
     

@@ -1,4 +1,14 @@
 %ABRIR EL ARCHIVO
+%El ambos archivos deben modificarse para reemplazar las D por E
+%En el archivo BODIES.OUT pegar el separador '$$$$$$' antes de la primera
+%partícula
+%En el archivo BODIES.OUT reemplazar al final de la última partícula (antes de
+%las 3 del muro)'$$$$$$' por la palabra 'END'
+%En el archivo DOF.OUT.## reemplazar la primera línea
+%!------------------------- por el separador $$$$$$
+%En ambos archivos reemplazar '=-' por '= -'
+%Borrar el primer espacio del archivo Coordenadas.scr para que lo pueda
+%leer Autocad
 fileBodies = fopen('BODIES.OUT','r');
 %CREAR EL ARCHIVO DE RESULTADOS
 fileResults = fopen('Coordenadas.scr', 'w');
@@ -14,15 +24,15 @@ finished = 0;
 i = 1;
 final = 'END';
 %Archivo con la información de translación y rotación de los polígonos
-fileDof = fopen('DOF.OUT.10');
+fileDof = fopen('DOF.OUT.15');
 %Información de encabezado
-textscan(fileDof, '%s %s %s %s', 2);
+te = textscan(fileDof, '%s %s %s %s', 2);
 %Ciclo para revisar el contenido del primer polígono
 while ~finished 
     if isequal(firstLine,separator)
         textscan(fileBodies, '%s %s %s %s %s %s %s %s %s %s',5);
         temp = textscan(fileBodies, '%*s %*s %*s %f %*s %f %*s %*s',1);
-        textscan(fileDof,'%s %s',4);
+        te  = textscan(fileDof,'%s %s',4);
         dofTemp = textscan(fileDof, '%*s %*s %*s %f %*s %f %*s %f',1);
         C0x = cell2mat(temp(1,1));%Centro inicial de la partícula
         C0y = cell2mat(temp(1,2));
