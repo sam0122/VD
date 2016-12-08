@@ -1,29 +1,29 @@
-rng(0.5, 'twister');
+%rng(0.7, 'twister');
 %Rutina para la generación y ubicación de los esqueletos
 El = 0.8; %Variable de elongación de las partículas.
 %Distribución de puntos y áreas según granulometría
 %Vector de diámetros
-vD = [12.5;9.5;4.75;2.36;1.18;0.6;0.3];
+vD = [19;12.5;9.5;4.75;2.36;1.18;0.6];
 vT = vD.^2*pi()*0.25;
 vA = [0.047255;0.061587;0.565567;0.280371;0.042375;0.002792;0.000052];
-aT = 30*30;
+aT = 110*110;
 voids = 0.2;
 G = generateGran(vD, vA, vT, aT, voids);
 %Número de puntos máximo por esqueleto de agregado
-nPMx = 13;
+nPMx = 21;
 %Número de puntos mínimo por esqueleto de agregado
 nPMn = 9;
 %Número de puntos por esqueleto de vacío
 nPV = 5;
 %TEST MODIFICACIÓN DEL NÚMERO DE POLÍGONOS DE G
 %G(:,4) = [1;1;21;43;26;7;1];
-%G(:,4) = [2;	5;	169;	340;	206;	53;	4];
+G(:,4) = [1;1;	3; 81;	322;	393; 0];
 %G(:,4) = [1;	1;	4;	7;	5;	2;	1];
-G(:,4) = [1;	1;	2;	4;	2;	1;	1];
+%G(:,4) = [1;	1;	8;	8;	8;	8;	4];
 nAg = sum(G);
 nAg = nAg(1,4);
-nV = 4; %Número de polígonos que representan vacíos
-tamVacios = 3; %Tamaño promedio vacíos
+nV = 700; %Número de polígonos que representan vacíos
+tamVacios = 0.25; %Tamaño promedio vacíos
 %Rutina para la generación inicial de los polígonos centrados en el origen.
 %Las 3 últimas columan guardan el tamaño de tamiz y las coordenadas del
 %centro
@@ -68,8 +68,8 @@ end
 %Definición del tamaño de la caja
 xmin = 0;
 ymin = 0;
-xmax = 30;
-ymax = 30;
+xmax = 110;
+ymax = 110;
 %----------------------------------------------------------------------------------
 %Definición de los bordes de los polígonos. Último término es el primero
 %repetido--> tener polígono cerrado
@@ -89,14 +89,19 @@ IV = 1;
 %Máximas iteraciones permitidas antes de abandonar el intento de ubicar un
 %polígono
 tol = 500;
+%Seeding de los puntos
+seedSkip = randi(20000,1,1);
+h = haltonset(2,'Skip', seedSkip);
+h = scramble(h,'RR2');
+center = net(h,20000);
 %Revisión del cuadrante del polígono
 for i = 1:2:(nAg*2)
     found = 0;
     counter = 1;
     while found == 0
-        xCen = xmax*rand(1,1);
-        yCen  = ymax*rand(1,1);
-        rot = randi([-45 45], 1, 1);
+        xCen = xmax*center(randi(20000,1,1),1);
+        yCen  = ymax*center(randi(20000,1,1),2);
+        rot = -45 + 90*rand(1, 1);
         if xCen > xmax*0.5
             if yCen > ymax*0.5
                 %Cuadrante I
@@ -390,15 +395,20 @@ I = 1;
 II = 1;
 III = 1;
 IV = 1;
+%Seeding
+seedSkip = randi(30000,1,1);
+h = haltonset(2,'Skip', seedSkip);
+h = scramble(h,'RR2');
+center = net(h,30000);
 %Ciclo para agregar vacíos
 %-------------------------------------------------------------------------------------------------------------------
 for i=1:2:(nV*2)
     found = 0;
     counter = 1;
     while found == 0
-        xCen = xmax*rand(1,1);
-        yCen  = ymax*rand(1,1);
-        rot = randi([-45 45], 1, 1);
+        xCen = xmax*center(randi(30000,1,1),1);
+        yCen  = ymax*center(randi(30000,1,1),2);
+        rot = -45 + 90*rand(1, 1);
         if xCen > xmax*0.5
             if yCen > ymax*0.5
                 %Cuadrante I
@@ -746,7 +756,8 @@ end
 %Archivos de salida
 %Datos de agregados
 agg = fopen('Agregados.txt','w');
-format = '%10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f \n';
+%MODIFICAR SI SE CAMBIA EL NUMERO MÁXIMO DE PUNTOS
+format = '%10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f \n';
 dimTotal = sI + sII + sIII + sIV - 4;
 pol = zeros(dimTotal, nPMx + 3); 
 col = size(polI);

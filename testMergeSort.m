@@ -5,5 +5,7 @@
 %center = [mean(list(:,1)), mean(list(:,2))];
 %mergeSort(list,center);
 list = [3 11;12 0;12 8;5 3;5 7;10 4;8 12];
-center = [mean(list(:,1)), mean(list(:,2))];
-mergeSort(list,center);
+fill(list(:,1), list(:,2),[0 0 0]);
+%r = cart2pol(list(:,1), list(:,2));
+%center = [mean(list(:,1)), mean(list(:,2))];
+%mergeSort(list);

@@ -42,8 +42,11 @@ classdef Agregates < handle
             %Coordenadas del baricentro /podría ser el centroide o las
             %coordenadas del centro del esqueleto
             Cx = mean(polF(:,1));
-            Cy = mean(polF(:,1));
+            Cy = mean(polF(:,2));
             polF = mergeSort(polF, [Cx Cy]);
+            s = size(polF);
+            s = s(1,1);
+            polF(s+1,:) = polF(1,:);
         end
     end
     

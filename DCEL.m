@@ -92,13 +92,22 @@ classdef DCEL < handle
                 currentFace = obj.faces{i,1};
                 pol = currentFace.processFace(xmin,ymin,xmax,ymax);
                 if ~isempty(pol)
-                    fill(pol(:,1),pol(:,2),color);
+                    plot(pol(:,1),pol(:,2),'r');
                     hold on
                 end
             end
             
         end
         
+        function drawVertex(obj)
+            for i =1:obj.vsize
+                currentVertex = obj.vertex{i,1};
+                vx = currentVertex.x;
+                vy = currentVertex.y;
+                plot(vx, vy, 'g*');
+                hold on
+            end
+        end
         
         
     end

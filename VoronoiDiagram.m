@@ -1,15 +1,15 @@
 %Cargar los puntos de los archivos Vacios.txt y Agregados.txt
-nAgg = 12;%Número de agregados 
-nV = 4;%Número de vacíos
+nAgg = 801;%Número de agregados 
+nV = 700;%Número de vacíos
 vecAgg = [];
 vecVacios = [];
 fileAgg = fopen('Agregados.txt');
 %Ciclo que recorre cada una de las filas del archivo de texto
 for i=1:nAgg*2
-    temp = textscan(fileAgg, '%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f',1);
+    temp = textscan(fileAgg, '%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f',1);
     %vecAgg(i,1) = cell2mat(temp(1,11));%Incluir el centro como punto de
     %Voronoi
-    vecAgg(i,1:16) = cell2mat(temp(1,1:16));
+    vecAgg(i,1:24) = cell2mat(temp(1,1:24));
     %vecAgg(i,1:11) = cell2mat(temp(1,1:11));
 end
 fileVacios = fopen('Vacíos.txt');
@@ -19,8 +19,19 @@ for i=1:nV*2
     %vecVacios(i,2:7) = cell2mat(temp(1,1:6));
     vecVacios(i,1:6) = cell2mat(temp(1,1:6));
 end
-n = nAgg + nV;
-VD = Voronoi(n, nAgg);
+nTP = 0;
+%Ciclo que lee el número de puntos total a procesar
+for  i = 1:2:nAgg*2
+    if vecAgg(i,1)
+        nTP = nTP + 21;
+    else
+        nTP = nTP + 9;
+    end
+end
+for  i = 1:2:nV*2
+    nTP = nTP + 5;
+end
+VD = Voronoi(nTP, nAgg);
 %----------------------------------------------------------------------------------------------------
 %Crear los sitios a partir de la información importada
 %p = zeros(n,2);
@@ -38,7 +49,7 @@ for i = 1:2:nAgg*2
     extra = vecAgg(i,1);
     nP = 0;
     if extra
-        nP = 13;
+        nP = 21;
     else
         nP = 9;
     end
@@ -74,13 +85,14 @@ for i = 1:2:nV*2
     end
 end
 %voronoi(p(:,1),p(:,2));
+hold on
 %}CONTADOR TEMPORAL
 counter1 = 0;
 counter2 = 0;
 xmin = 0;
-xmax = 30;
+xmax = 110;
 ymin = 0;
-ymax = 30;
+ymax = 110;
 
 %Ciclo algoritmo
 while VD.heap.currentSize > 0
@@ -97,6 +109,7 @@ while VD.heap.currentSize > 0
 end
 %Procesar los polígonos y graficarlos
 VD.polygons.processFaces(xmin, ymin, xmax, ymax);
+%VD.dcel.drawVertex();
 axis equal
 %{
 ver = VD.dcel.vertex;

@@ -13,7 +13,9 @@ if t && ~extraPoints
     cooFin(1,:) = cooRot(1,:) + x;
     cooFin(2,:) = cooRot(2,:) + y;
 elseif t && extraPoints
-    n = 13;
+    %n = 12;
+    %n = 17;
+    n = 21;
     cooRot = zeros(2,n);
     for i=1:n
         cooRot(:,i) = matRot*coo(:,i);

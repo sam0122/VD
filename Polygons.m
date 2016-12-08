@@ -23,15 +23,20 @@ classdef Polygons < handle
             b = 122/255;
             g = b;
             color = [r b g];
+            fileResults = fopen('CoordenadasVoronoi.scr', 'w');
             for i = 1:obj.sz
                 %AÑADIR RUTINA QUE ESCRIBA EL ARCHIVO DE SALIDA SEPARANDO
                 %POR AGG
                 currentAgg = obj.agregados{i,1};
                 pol = currentAgg.processFace(xmin,ymin,xmax,ymax);
                 if ~isempty(pol)
-                    plot(pol(:,1),pol(:,2));
+                    fill(pol(:,1),pol(:,2),color);
                     hold on
                 end
+                fprintf(fileResults,'\n');
+                fprintf(fileResults,'%s','pline ');
+                fprintf(fileResults,'%2.9f,%2.9f\n',pol');
+                
             end
             
         end
